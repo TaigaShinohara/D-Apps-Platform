@@ -84,6 +84,15 @@ for (const lang of ['ja', 'en']) {
       ),
     ).toBe(true);
     await expect(page.locator('a[download]')).toBeVisible();
+    // A wider fallback font reproduces the Linux reflow regression on macOS too.
+    await page.evaluate(() => {
+      document.documentElement.style.fontFamily = 'Verdana, sans-serif';
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
   });
 }
 test('critical navigation and download work without JavaScript', async ({
