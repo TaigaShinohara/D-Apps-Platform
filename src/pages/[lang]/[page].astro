@@ -7,7 +7,18 @@ export function getStaticPaths() {
   const documents = import.meta.glob<Document>('../../content/pages/*/*.md', {
     eager: true,
   });
-  const required = ['about', 'privacy', 'safety', 'license', 'support'];
+  const required = new Set([
+    'about',
+    'privacy',
+    'safety',
+    'license',
+    'support',
+  ]);
+  for (const path of Object.keys(documents)) {
+    const match = path.match(/\/pages\/(ja|en)\/([^/]+)\.md$/);
+    if (!match) throw new Error(`Unsupported document locale: ${path}`);
+    required.add(match[2]);
+  }
   for (const lang of ['ja', 'en'])
     for (const page of required) {
       if (!documents[`../../content/pages/${lang}/${page}.md`])
