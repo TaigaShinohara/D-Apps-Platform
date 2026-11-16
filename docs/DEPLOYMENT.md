@@ -17,7 +17,7 @@ Free-plan eligibility and account contract are not established by successful tem
 
 ## Prerequisites
 
-Use the project's authenticated, least-privileged AWS connection. The workstation's default STS call returned `InvalidClientTokenId` during preparation; no valid project-specific AWS connection or hosted-zone ID was established. Do not substitute another project's administrator profile. Authentication is a separate prerequisite from authorization to publish.
+Use the project's authenticated, least-privileged AWS connection. The workstation's default and `taiga_deeple_dev` STS calls returned `InvalidClientTokenId` during preparation; no valid project-specific AWS connection or hosted-zone ID was established. The owner selected a dedicated D-Apps connection. [AWS-AUTH.md](AWS-AUTH.md) documents its isolated local login and read-only entry. Do not substitute another project's administrator profile. Authentication is a separate prerequisite from authorization to publish.
 
 Record verified account ID, existing hosted-zone ID, existing records, existing GitHub OIDC provider ARN, Free-plan eligibility and payment-plan type in the private operations record. Never commit credentials or account-specific authentication files. With valid credentials, inspect only relevant resources:
 

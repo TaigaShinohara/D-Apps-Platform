@@ -44,6 +44,7 @@ Mac の既存 Chrome を使う場合は `PLAYWRIGHT_USE_SYSTEM_CHROME=1` を設�
 **このリポジトリのマージは、AWS へのデプロイを実行しません。** CloudFormation はビルド時に `infra/generated/` に生成され、初期値では CloudFront 配信が無効です。`Stage verified content (manual)` は、承認付きの `production` 環境から検証済みファイルを配置するだけです。配信切替・DNS 変更には別の管理操作が必要です。
 
 - [AWS の構成・公開・復旧手順](docs/DEPLOYMENT.md)
+- [D-Apps 専用の AWS 認証入口](docs/AWS-AUTH.md)
 - [公開前の確認事項と費用の前提](docs/RELEASE-READINESS.md)
 - [検証記録](docs/QA.md)
 - [Google Modern Web Guidance の適用](docs/MODERN-WEB-GUIDANCE.md)
