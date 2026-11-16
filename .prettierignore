@@ -1,0 +1,14 @@
+node_modules
+dist
+.astro
+.agents
+.artifacts
+.playwright
+.cache
+infra/generated
+playwright-report
+test-results
+package-lock.json
+skills-lock.json
+public/media
+src/assets

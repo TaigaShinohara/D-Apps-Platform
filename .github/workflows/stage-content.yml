@@ -1,0 +1,47 @@
+name: Stage verified content (manual)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: d-apps-production-content
+  cancel-in-progress: false
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+jobs:
+  stage:
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    runs-on: macos-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm test && npm run build && npm run verify:site
+      - run: npm run verify:release -- --fetch --macos
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+        with:
+          role-to-assume: ${{ vars.AWS_PUBLISH_ROLE_ARN }}
+          aws-region: ap-northeast-1
+          role-session-name: d-apps-content
+          mask-aws-account-id: true
+      - name: Stage immutable, verified content
+        env:
+          SITE_BUCKET: ${{ vars.SITE_BUCKET }}
+          DOWNLOADS_BUCKET: ${{ vars.DOWNLOADS_BUCKET }}
+          RELEASE_ID: ${{ github.sha }}
+        run: node scripts/publish-content.mjs "$SITE_BUCKET" "$DOWNLOADS_BUCKET" "$RELEASE_ID"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: matching-edge-configuration
+          path: infra/generated/
+          retention-days: 7

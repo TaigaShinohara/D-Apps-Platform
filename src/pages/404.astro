@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  lang="ja"
+  title="ページが見つかりません"
+  description="Page not found."
+  noindex
+>
+  <section class="prose wrap">
+    <p class="eyebrow">404 / NOT FOUND</p>
+    <h1 id="content" tabindex="-1">
+      ページが見つかりません。
+    </h1>
+    <p lang="en">This page could not be found.</p>
+    <p>
+      <a href="/ja/">日本語のホームへ</a> ·{' '}
+      <a lang="en" href="/en/">
+        English home
+      </a>
+    </p>
+  </section>
+</Layout>
