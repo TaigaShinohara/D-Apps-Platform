@@ -1,0 +1,163 @@
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { apps } from '../../src/lib/catalog';
+import { scriptIntegrity, securityHeaders } from '../../src/lib/security.mjs';
+
+for (const lang of ['ja', 'en']) {
+  test(`${lang}: discover, switch language, verify download and privacy`, async ({
+    page,
+    context,
+    request,
+  }) => {
+    const external: string[] = [];
+    const errors: string[] = [];
+    page.on('request', (req) => {
+      if (!req.url().startsWith('http://127.0.0.1:4321/'))
+        external.push(req.url());
+    });
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text());
+    });
+    await page.goto(`/${lang}/`);
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('[data-filters]')).toHaveCount(0);
+    await page
+      .getByRole('heading', { name: 'OneClip', exact: true })
+      .getByRole('link')
+      .click();
+    await expect(page).toHaveURL(new RegExp(`/${lang}/apps/oneclip/`));
+    const other = lang === 'ja' ? 'en' : 'ja';
+    await page.locator(`.language-switch a[lang="${other}"]`).click();
+    await expect(page).toHaveURL(new RegExp(`/${other}/apps/oneclip/`));
+    const download = page.locator('a[download]');
+    const href = await download.getAttribute('href');
+    expect(href).toBe('/downloads/oneclip/1.0.1/OneClip-1.0.1.zip');
+    const response = await request.get(href!);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-disposition']).toContain('attachment');
+    expect(
+      createHash('sha256')
+        .update(await response.body())
+        .digest('hex'),
+    ).toBe('231818840a6e122cc5eb7a2743cf236a1608a62472a6df6140f167e4114e29ed');
+    expect(await context.cookies()).toEqual([]);
+    expect(
+      await page.evaluate(() => ({
+        local: localStorage.length,
+        session: sessionStorage.length,
+      })),
+    ).toEqual({ local: 0, session: 0 });
+    expect(external).toEqual([]);
+    expect(errors).toEqual([]);
+  });
+  test(`${lang}: accessible structure and layout at narrow widths and enlarged text`, async ({
+    page,
+  }) => {
+    for (const path of [
+      `/${lang}/`,
+      `/${lang}/apps/oneclip/`,
+      `/${lang}/privacy/`,
+    ]) {
+      await page.goto(path);
+      const result = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+        .analyze();
+      expect(result.violations).toEqual([]);
+    }
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto(`/${lang}/apps/oneclip/`);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    // Browser devtools-style enlargement, kept outside production code.
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '32px';
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await expect(page.locator('a[download]')).toBeVisible();
+    // A wider fallback font reproduces the Linux reflow regression on macOS too.
+    await page.evaluate(() => {
+      document.documentElement.style.fontFamily = 'Verdana, sans-serif';
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  });
+}
+test('critical navigation and download work without JavaScript', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto('http://127.0.0.1:4321/ja/');
+  await page
+    .getByRole('heading', { name: 'OneClip', exact: true })
+    .getByRole('link')
+    .click();
+  await expect(page.locator('a[download]')).toBeVisible();
+  await page.locator('.language-switch a[lang="en"]').click();
+  await expect(page).toHaveURL(/\/en\/apps\/oneclip\//);
+  await context.close();
+});
+test('skip link, CSP, 404 and write rejection', async ({
+  page,
+  request,
+  browserName,
+}) => {
+  const response = await page.goto('/ja/');
+  expect(response!.headers()['content-security-policy']).toContain(
+    "connect-src 'none'",
+  );
+  // WebKit on macOS follows Safari's default: Option-Tab includes links.
+  await page.keyboard.press(
+    browserName === 'webkit' && process.platform === 'darwin'
+      ? 'Alt+Tab'
+      : 'Tab',
+  );
+  await expect(page.locator('.skip-link')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#content')).toBeFocused();
+  expect((await request.get('/not-a-page')).status()).toBe(404);
+  expect((await request.post('/ja/', { data: 'not-accepted' })).status()).toBe(
+    405,
+  );
+});
+test('filter behavior supports six apps without network or persistence', async ({
+  page,
+}) => {
+  await page.goto('/ja/');
+  // The production script is tested against an isolated six-card fixture.
+  await page.route('http://127.0.0.1:4321/filter-fixture', async (route) => {
+    const html = `<html lang="en"><meta charset="utf-8"><title>Filter fixture</title><div data-filters hidden><label>Category<select data-category><option value="">All</option><option value="utilities">Utilities</option></select></label><label>Platform<select data-platform><option value="">All</option><option value="macOS">macOS</option></select></label></div>${Array.from({ length: 6 }, (_, i) => `<article data-app-card data-category="${i < 3 ? 'utilities' : 'creative'}" data-platforms="${i % 2 ? 'Windows' : 'macOS'}">App ${i}</article>`).join('')}<p data-result-status role="status"></p><script src="/scripts/filter.js" integrity="${scriptIntegrity}" defer></script></html>`;
+    await route.fulfill({
+      contentType: 'text/html',
+      headers: securityHeaders,
+      body: html,
+    });
+  });
+  await page.goto('/filter-fixture');
+  await page
+    .getByRole('combobox', { name: 'Category' })
+    .selectOption('utilities');
+  await expect(page.locator('[data-app-card]:visible')).toHaveCount(3);
+  await page.getByRole('combobox', { name: 'Platform' }).selectOption('macOS');
+  await expect(page.locator('[data-app-card]:visible')).toHaveCount(2);
+  await expect(page.getByRole('status')).toHaveText('2 apps');
+  expect(apps.length).toBe(1);
+});
+test('direct release bytes available for deterministic download test', async () => {
+  expect((await readFile('.artifacts/releases/OneClip-1.0.1.zip')).length).toBe(
+    3821021,
+  );
+});

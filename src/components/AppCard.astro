@@ -1,0 +1,61 @@
+---
+import type { App, Locale } from '../lib/catalog';
+import { categories } from '../lib/catalog';
+interface Props {
+  app: App;
+  lang: Locale;
+}
+const { app, lang } = Astro.props;
+const platforms = [...new Set(app.distributions.map((d) => d.platform))];
+---
+
+<article
+  class="app-card"
+  data-app-card
+  data-category={app.category}
+  data-platforms={platforms.join(',')}
+>
+  <img
+    class="app-icon"
+    src={`/media/${app.id}-icon.png`}
+    width="80"
+    height="80"
+    alt=""
+    loading="lazy"
+  />
+  <header>
+    <p class="eyebrow">{categories[app.category][lang]}</p>
+    <h3>
+      <a href={`/${lang}/apps/${app.id}/`}>{app.name}</a>
+    </h3>
+  </header>
+  <div>
+    <p class="card-summary">{app.summary[lang]}</p>
+    <p class="card-meta">
+      {platforms.join(' / ')}
+      <span aria-hidden="true"> · </span>
+      {app.price[lang]}
+      <span aria-hidden="true"> · </span>
+      {[
+        ...new Set(
+          app.distributions.map((item) =>
+            item.kind === 'direct'
+              ? lang === 'ja'
+                ? '直接配布'
+                : 'Direct download'
+              : lang === 'ja'
+                ? '公式ストア'
+                : 'Official store',
+          ),
+        ),
+      ].join(' / ')}
+    </p>
+  </div>
+  <footer>
+    <a class="text-link" href={`/${lang}/apps/${app.id}/`}>
+      {lang === 'ja' ? '詳しく見る' : 'Explore'}
+      <span class="sr-only"> {app.name}</span>
+      <span aria-hidden="true">↗</span>
+    </a>
+  </footer>
+</article>

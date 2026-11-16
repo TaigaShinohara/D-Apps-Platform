@@ -1,0 +1,84 @@
+{
+  "id": "oneclip",
+  "name": "OneClip",
+  "status": "published",
+  "category": "productivity",
+  "summary": {
+    "ja": "必要なところを集めて、ひと貼りで伝える。",
+    "en": "Capture what matters. Share it in one image."
+  },
+  "tagline": {
+    "ja": "伝えたいことを、ひとつに。",
+    "en": "Bring your point into focus."
+  },
+  "description": {
+    "ja": "画面の一部をさっとコピー。いくつかの画面を一枚にまとめて、コメントを添える。OneClipは、説明を伝わるかたちにするMacのメニューバーアプリです。",
+    "en": "Copy a part of your screen, combine a few captures, and add a comment. OneClip is a Mac menu bar app that turns what you see into something easy to share."
+  },
+  "price": { "ja": "無料・オープンソース", "en": "Free and open source" },
+  "requirements": {
+    "ja": "macOS 14以降。Apple Silicon / Intel対応のUniversal版。",
+    "en": "macOS 14 or later. Universal build for Apple Silicon and Intel."
+  },
+  "permissions": {
+    "ja": "撮影するときにmacOSの画面収録の許可が必要です。",
+    "en": "macOS Screen Recording permission is required when capturing your screen."
+  },
+  "privacy": {
+    "ja": "撮影画像・コメント・クリップボード内容を外部へ送信しません。画像はMacに自動保存され、保存期限や自動削除はありません。手動で更新を確認したときだけGitHubへ接続します。",
+    "en": "Screenshots, comments, and clipboard contents are not sent to an external service. Images are saved on your Mac without automatic expiration or deletion. The app connects to GitHub only when you manually check for updates."
+  },
+  "limitations": {
+    "ja": "macOS 14・Intel実機、全面的なVoiceOver対応、すべての画面構成は未実証です。注釈は機密情報を隠す機能ではなく、撮影原本も残ります。",
+    "en": "macOS 14, Intel hardware, full VoiceOver support, and every display configuration have not been validated. Annotations do not redact sensitive information, and original captures remain on your Mac."
+  },
+  "features": [
+    {
+      "ja": "一箇所を選んで、すぐコピー",
+      "en": "Select an area and copy it instantly"
+    },
+    {
+      "ja": "1〜4枚のキャプチャを、一枚にまとめる",
+      "en": "Combine one to four captures in one image"
+    },
+    {
+      "ja": "吹き出し・囲み・番号で、要点を伝える",
+      "en": "Make your point with comments, outlines, and numbers"
+    }
+  ],
+  "instructions": [
+    {
+      "ja": "ZIPをダウンロードして展開します。",
+      "en": "Download and unzip the archive."
+    },
+    {
+      "ja": "OneClip.appを「アプリケーション」フォルダへ移動します。",
+      "en": "Move OneClip.app to your Applications folder."
+    },
+    {
+      "ja": "起動後、画面上端のOneClipメニューから撮影を始めます。必要なときに画面収録を許可します。",
+      "en": "Open OneClip and start from its menu bar icon. Allow Screen Recording when prompted for a capture."
+    }
+  ],
+  "updated": "2026-11-03",
+  "sourceUrl": "https://github.com/TaigaShinohara/OneClip",
+  "supportUrl": "https://github.com/TaigaShinohara/OneClip/issues",
+  "license": "MIT",
+  "distributions": [
+    {
+      "kind": "direct",
+      "platform": "macOS",
+      "version": "1.0.1",
+      "filename": "OneClip-1.0.1.zip",
+      "bytes": 3821021,
+      "sha256": "231818840a6e122cc5eb7a2743cf236a1608a62472a6df6140f167e4114e29ed",
+      "source": "https://github.com/TaigaShinohara/OneClip/releases/download/v1.0.1/OneClip-1.0.1.zip",
+      "releaseUrl": "https://github.com/TaigaShinohara/OneClip/releases/tag/v1.0.1",
+      "verification": {
+        "status": "approved",
+        "evidence": "https://github.com/TaigaShinohara/OneClip/blob/main/docs/RELEASE-1.0.1.md",
+        "signing": "Developer ID / Apple notarization"
+      }
+    }
+  ]
+}

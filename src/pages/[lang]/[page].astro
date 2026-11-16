@@ -1,0 +1,59 @@
+---
+import type { MarkdownInstance } from 'astro';
+import type { Locale } from '../../lib/catalog';
+import Layout from '../../layouts/Layout.astro';
+type Document = MarkdownInstance<{ title: string; description: string }>;
+export function getStaticPaths() {
+  const documents = import.meta.glob<Document>('../../content/pages/*/*.md', {
+    eager: true,
+  });
+  const required = new Set([
+    'about',
+    'privacy',
+    'safety',
+    'license',
+    'support',
+  ]);
+  for (const path of Object.keys(documents)) {
+    const match = path.match(/\/pages\/(ja|en)\/([^/]+)\.md$/);
+    if (!match) throw new Error(`Unsupported document locale: ${path}`);
+    required.add(match[2]);
+  }
+  for (const lang of ['ja', 'en'])
+    for (const page of required) {
+      if (!documents[`../../content/pages/${lang}/${page}.md`])
+        throw new Error(`Missing ${lang}/${page}`);
+    }
+  return Object.entries(documents).map(([path, document]) => {
+    const [, lang, page] = path.match(/\/pages\/(ja|en)\/([^/]+)\.md$/)!;
+    if (
+      !document.frontmatter.title?.trim() ||
+      !document.frontmatter.description?.trim()
+    )
+      throw new Error(`Missing metadata in ${path}`);
+    return { params: { lang, page }, props: { document } };
+  });
+}
+const { document } = Astro.props as { document: Document };
+const { Content, frontmatter } = document;
+const lang = Astro.params.lang as Locale;
+---
+
+<Layout
+  lang={lang}
+  title={frontmatter.title}
+  description={frontmatter.description}
+  path={`${Astro.params.page}/`}
+>
+  <article class="prose wrap">
+    <a class="back-link" href={`/${lang}/`}>
+      ← {lang === 'ja' ? 'ホーム' : 'Home'}
+    </a>
+    <p class="eyebrow">D-APPS / {Astro.params.page?.toUpperCase()}</p>
+    <h1 id="content" tabindex="-1">
+      {frontmatter.title}
+    </h1>
+    <p class="lead">{frontmatter.description}</p>
+    <Content />
+  </article>
+</Layout>

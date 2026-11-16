@@ -1,0 +1,17 @@
+---
+import { type App, type Distribution, type Locale } from '../lib/catalog';
+import { distributionLink } from '../lib/distribution';
+interface Props {
+  app: App;
+  item: Distribution;
+  lang: Locale;
+}
+const { app, item, lang } = Astro.props;
+const direct = item.kind === 'direct';
+const { label, ...attributes } = distributionLink(app, item, lang);
+---
+
+<a class="button" {...attributes}>
+  <span aria-hidden="true">{direct ? '↓' : '↗'}</span>
+  {label}
+</a>

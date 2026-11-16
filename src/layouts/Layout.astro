@@ -1,0 +1,147 @@
+---
+import '../styles/global.css';
+import { metaCsp } from '../lib/security.mjs';
+import type { Locale } from '../lib/catalog';
+interface Props {
+  lang: Locale;
+  title: string;
+  description: string;
+  path?: string;
+  noindex?: boolean;
+}
+const { lang, title, description, path = '', noindex = false } = Astro.props;
+const ja = lang === 'ja';
+const canonical = `https://deepledeeple.com/${lang}/${path}`;
+const links = ja
+  ? [
+      ['about', 'D-Appsについて'],
+      ['privacy', 'プライバシー'],
+      ['safety', '配布と安全性'],
+      ['license', 'ライセンス'],
+      ['support', 'サポート'],
+    ]
+  : [
+      ['about', 'About D-Apps'],
+      ['privacy', 'Privacy'],
+      ['safety', 'Distribution & safety'],
+      ['license', 'Licenses'],
+      ['support', 'Support'],
+    ];
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content={metaCsp} />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <title>{title} | D-Apps</title>
+    <link rel="canonical" href={canonical} />
+    <link
+      rel="alternate"
+      hreflang="ja"
+      href={`https://deepledeeple.com/ja/${path}`}
+    />
+    <link
+      rel="alternate"
+      hreflang="en"
+      href={`https://deepledeeple.com/en/${path}`}
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={`https://deepledeeple.com/ja/${path}`}
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={`${title} | D-Apps`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ja ? 'ja_JP' : 'en_US'} />
+  </head>
+  <body>
+    <header class="site-header wrap">
+      <a class="skip-link" href="#content">
+        {ja ? '本文へ移動' : 'Skip to content'}
+      </a>
+      <a
+        class="brand"
+        href={`/${lang}/`}
+        aria-label={ja ? 'D-Apps ホーム' : 'D-Apps home'}
+      >
+        <img
+          class="brand-mark"
+          src="/favicon.svg"
+          alt=""
+          width="36"
+          height="36"
+        />
+        <span>D-Apps</span>
+      </a>
+      <nav aria-label={ja ? 'メイン' : 'Main'} class="header-links">
+        <a href={`/${lang}/#apps`}>{ja ? 'アプリ' : 'Apps'}</a>
+        <a href={`/${lang}/about/`}>{ja ? 'このサイトについて' : 'About'}</a>
+      </nav>
+      <nav aria-label={ja ? '言語' : 'Language'} class="language-switch">
+        <a
+          lang="ja"
+          href={`/ja/${path}`}
+          aria-current={ja ? 'page' : undefined}
+        >
+          日本語
+        </a>
+        <span aria-hidden="true">/</span>
+        <a
+          lang="en"
+          href={`/en/${path}`}
+          aria-current={!ja ? 'page' : undefined}
+        >
+          EN
+        </a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer wrap">
+      <div class="footer-top">
+        <div>
+          <a class="brand footer-brand" href={`/${lang}/`}>
+            <img
+              class="brand-mark"
+              src="/favicon.svg"
+              alt=""
+              width="36"
+              height="36"
+            />
+            D-Apps
+          </a>
+          <p>
+            {ja
+              ? '小さな道具を、ていねいに。'
+              : 'Small tools, thoughtfully made.'}
+          </p>
+        </div>
+        <nav aria-label={ja ? 'サイト情報' : 'Site information'}>
+          {links.map(([slug, label]) => (
+            <a href={`/${lang}/${slug}/`}>{label}</a>
+          ))}
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <small>© 2026 D-Apps</small>
+        <a
+          href="https://github.com/TaigaShinohara/D-Apps-Platform"
+          rel="noopener noreferrer"
+        >
+          {ja ? 'サイトのソースコード' : 'Site source code'}{' '}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </footer>
+  </body>
+</html>
