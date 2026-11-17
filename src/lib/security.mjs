@@ -15,5 +15,5 @@ export const securityHeaders = {
     'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()',
   'cross-origin-opener-policy': 'same-origin',
   'cross-origin-resource-policy': 'same-origin',
-  'strict-transport-security': 'max-age=300',
+  'strict-transport-security': 'max-age=31536000; includeSubDomains',
 };

@@ -1,0 +1,9 @@
+# D-Apps (dobulab.com) security contact information (RFC 9116).
+# Vulnerability reports for the site itself. Please do not use public
+# issues for details that could enable an attack.
+Contact: https://github.com/TaigaShinohara/D-Apps-Platform/security/advisories/new
+Contact: mailto:support-dapps@dobulab.com
+Expires: 2027-11-17T23:59:59+09:00
+Preferred-Languages: ja, en
+Canonical: https://dobulab.com/.well-known/security.txt
+Policy: https://github.com/TaigaShinohara/D-Apps-Platform/blob/main/SECURITY.md
