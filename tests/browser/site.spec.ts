@@ -247,6 +247,11 @@ test('published external apps can be reached in both languages without JavaScrip
       await expect(link).toBeVisible();
       await expect(link).toHaveAttribute('href', listing.url);
       expect(await link.getAttribute('download')).toBeNull();
+      if (listing.id === 'profilemaker') {
+        await expect(
+          page.locator('.download-panel .external-link'),
+        ).toHaveCount(0);
+      }
       await link.focus();
       await expect(link).toBeFocused();
       if (lang === 'ja')

@@ -155,7 +155,7 @@ export const appSchema = z
     instructions: z.array(bilingual).min(1),
     updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     sourceUrl: httpsUrl.optional(),
-    supportUrl: httpsUrl,
+    supportUrl: httpsUrl.optional(),
     license: text,
     iconFallback: z
       .string()
