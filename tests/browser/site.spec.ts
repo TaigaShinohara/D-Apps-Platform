@@ -338,6 +338,7 @@ test('the homepage distinguishes development projects and public skills from app
       'Store Submission Skills',
       'Easy i18n',
       'Simple Glass',
+      'Minimal Information Design',
     ]);
     await expect(
       skills.locator(`a[href="${github}skills-updater"]`),
