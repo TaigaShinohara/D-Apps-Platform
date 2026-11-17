@@ -25,16 +25,40 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+      actions: read
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          fetch-depth: 2
+      - name: Require the previous main commit
+        run: |
+          set -euo pipefail
+          parent="$(git rev-parse --verify --end-of-options 'HEAD^')"
+          case "$parent" in
+            *[!0-9a-f]*|''|0000000000000000000000000000000000000000)
+              echo "Previous main commit is missing" >&2
+              exit 1
+              ;;
+          esac
+          if [ "${#parent}" -ne 40 ]; then
+            echo "Previous main commit is not a full SHA" >&2
+            exit 1
+          fi
+          printf 'DISTRIBUTION_BASE_SHA=%s\n' "$parent" >> "$GITHUB_ENV"
+          printf 'DISTRIBUTION_REQUIRE_BASE=1\n' >> "$GITHUB_ENV"
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Require a successful CI run for this commit
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CI_COMMIT_SHA: ${{ github.sha }}
+          CI_REPOSITORY: ${{ github.repository }}
+        run: node scripts/require-ci-success.mjs
       - name: Check build resources
         run: |
           ps -eo pid,comm
@@ -47,7 +71,7 @@ jobs:
         with:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_PUBLISHER_SERVICE_ACCOUNT }}
+          service_account: ${{ vars.GCP_RELEASER_SERVICE_ACCOUNT }}
           create_credentials_file: true
       - name: Verify staged bytes and expected live version, then publish
         env:

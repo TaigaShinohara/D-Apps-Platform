@@ -10,14 +10,14 @@ The operator collects no forms, accounts, uploads, tracking identifiers or visit
 
 ## Reviewable configuration
 
-| Location                                | Purpose                                                                                                             |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `infra/gcp/main.tf`                     | Required APIs/Firebase on an existing dedicated project; Hosting site, publisher identity and restricted GitHub WIF |
-| `scripts/firebase-config.mjs`           | Shared security/cache headers, root redirect and trailing slashes; no server rewrites                               |
-| `firebase.generated.json`               | Generated local static-engine configuration, without project credentials                                            |
-| `infra/generated/firebase-serving.json` | Matching Hosting REST configuration                                                                                 |
-| `config/distribution-lock.json`         | Append-only size/SHA-256 records for immutable download URLs                                                        |
-| `config/revoked-downloads.json`         | Stopped URLs, removed from catalog links and staged files                                                           |
+| Location                                | Purpose                                                                                                                                   |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `infra/gcp/main.tf`                     | Required APIs/Firebase on an existing dedicated project; Hosting site, separate stager and releaser identities, and restricted GitHub WIF |
+| `scripts/firebase-config.mjs`           | Shared security/cache headers, root redirect and trailing slashes; no server rewrites                                                     |
+| `firebase.generated.json`               | Generated local static-engine configuration, without project credentials                                                                  |
+| `infra/generated/firebase-serving.json` | Matching Hosting REST configuration                                                                                                       |
+| `config/distribution-lock.json`         | Append-only size/SHA-256 records for immutable download URLs                                                                              |
+| `config/revoked-downloads.json`         | Stopped URLs, removed from catalog links and staged files                                                                                 |
 
 Terraform 1.17.2 and Google beta provider 8.11.0 are pinned. The provider lock is committed; state, plans, actual tfvars and credentials are ignored. Firebase resources require the beta provider. The actual dedicated-project plan/apply completed and a refresh plan showed no differences. This does not establish live delivery, DNS or application smoke-test acceptance.
 
@@ -31,20 +31,32 @@ Terraform does not create/link billing, redeem credits, create the Cloud project
 
 ## Identity and publication limits
 
-Follow [the dedicated Google setup](GOOGLE-CLOUD-AUTH.md). Short-lived Workload Identity Federation replaces long-lived service-account keys. Trust requires repository ID `1459714940`, owner ID `178877625`, main, the exact production subject with immutable owner/repository IDs, and one of the two exact publishing workflow paths. Restrict the GitHub environment to main and owner approval. Pull-request CI has only content-read permission and no Google credentials.
+Follow [the dedicated Google setup](GOOGLE-CLOUD-AUTH.md). Short-lived Workload Identity Federation replaces long-lived service-account keys. Trust requires repository ID `1459714940`, owner ID `178877625`, and `refs/heads/main`. The stage workflow can authenticate only as the staging environment subject, and only that subject can impersonate the stager. The release workflow can authenticate only as the production environment subject, and only that subject can impersonate the releaser. Pull-request CI has only content-read permission and no Google credentials.
 
-Firebase Hosting cannot be controlled with custom IAM roles. Its predefined `roles/firebasehosting.admin` can publish and delete Hosting resources. Staging and publishing are separate script/workflow steps, **not separate IAM privileges**. Restrict this role to the dedicated project and review protected-environment/workflow changes. It grants no Owner/Editor, billing, DNS or IAM administration. See [Hosting IAM limitations](https://firebase.google.com/docs/projects/iam/permissions#hosting).
+[Firebase Hosting IAM](https://firebase.google.com/docs/projects/iam/permissions#hosting) does not offer a preview-only or live-release-only role, and custom roles cannot control Hosting. Both accounts therefore use the predefined `roles/firebasehosting.admin` on this dedicated project. That role can still delete Hosting resources. It does not grant Owner, Editor, billing, DNS, or IAM administration. The separation that IAM can enforce is which GitHub subject may borrow which account. Stage and release remain different workflow steps, and each workflow reads CI for the exact commit before it contacts Google.
 
-After reviewing Terraform outputs, set these non-secret production environment variables: `GCP_PROJECT_ID`, `FIREBASE_SITE_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_PUBLISHER_SERVICE_ACCOUNT`. Credential files from the official Google action are ignored, automatically cleaned up and excluded from artifacts.
+Credential files from the official Google action are ignored, cleaned up by the action, and excluded from artifacts.
+
+## Owner checklist before the next stage or release
+
+Do this once after the identity change is merged. Do not run the stage or release workflow until the last step. Applying Terraform and changing GitHub settings are manual; this repository does not apply them.
+
+1. Open the private Terraform directory that already holds this project's state. Copy the reviewed `infra/gcp` files into that work, keeping the existing state for this same project. Do not create a second Firebase project or Hosting site.
+2. Run `terraform plan` and read it. Expect the single publisher account to be removed, two accounts (`d-apps-hosting-stager` and `d-apps-hosting-releaser`) to be added, and the Workload Identity provider condition to require each workflow together with its own environment subject. The impersonation bindings should name those exact subjects, not the whole repository.
+3. Run `terraform apply` only after that plan matches the review. Record the outputs `GCP_PROJECT_ID`, `FIREBASE_SITE_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_STAGER_SERVICE_ACCOUNT`, and `GCP_RELEASER_SERVICE_ACCOUNT`.
+4. In GitHub, create an environment named exactly `staging` before the stage workflow runs. Limit deployments to the `main` branch. Require a reviewer, and choose the owner. These protection rules are available for this public repository without a paid plan.
+5. On the `staging` environment, set the non-secret variables `GCP_PROJECT_ID`, `FIREBASE_SITE_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, and `GCP_STAGER_SERVICE_ACCOUNT` from the Terraform outputs. Do not store them in git.
+6. On the existing `production` environment, keep deployment branches limited to `main` and keep a required owner reviewer. Set `GCP_RELEASER_SERVICE_ACCOUNT` from the outputs. Keep `GCP_PROJECT_ID`, `FIREBASE_SITE_ID`, and `GCP_WORKLOAD_IDENTITY_PROVIDER` there as well. Remove the retired `GCP_PUBLISHER_SERVICE_ACCOUNT` variable so a run cannot keep using the deleted account.
+7. Confirm the next stage run uses the `staging` environment and the next release run uses `production`. Both workflows refuse to continue unless the previous `main` commit is available and the `Verify site` workflow succeeded for that exact commit. Wait for that CI run to finish before starting either manual workflow.
 
 ## Reviewed release sequence
 
-1. Check CI for the reviewed main commit. It covers lint, types, unit tests, build, static checks, distribution history, browsers, dependencies and secret scanning. Smoke-test a new app binary when it is part of the release.
-2. Run **Stage verified Firebase version (manual)** from the reviewed commit. It downloads and verifies the size, SHA-256, archive boundaries, signature, notarization and Gatekeeper assessment of each active direct download on macOS. Staging finalizes a version and compares its file hashes, configuration and labels with the build. Record the version, commit and bundle digest.
-3. Read the current live version. After publication approval, run **Publish reviewed Firebase version (manual)** from the same commit with the staged version and the expected live version. Use `NONE` for a site with no live version. If main changed, stage again. The workflow rebuilds and verifies the staged files, configuration and labels before changing the live version.
+1. Check CI for the reviewed main commit. It covers lint, types, unit tests, build, static checks, distribution history, browsers, dependencies and secret scanning. Smoke-test a new app binary when it is part of the release. The stage and release workflows also refuse a commit whose `Verify site` run is unfinished or unsuccessful.
+2. Run **Stage verified Firebase version (manual)** from the reviewed `main` commit, in the `staging` environment. It compares the distribution lock and revocation list with the previous `main` commit, then downloads and verifies the size, SHA-256, archive boundaries, signature, notarization and Gatekeeper assessment of each active direct download on macOS. Staging finalizes a version and compares its file hashes, configuration and labels with the build. It does not change the live site. Record the version, commit and bundle digest.
+3. Read the current live version. After publication approval, run **Publish reviewed Firebase version (manual)** from the same commit in the `production` environment with the staged version and the expected live version. Use `NONE` for a site with no live version. If main changed, stage again. The workflow repeats the distribution-history and CI checks, rebuilds, and verifies the staged files, configuration and labels before changing the live version.
 4. Verify the result on the canonical and both default Firebase hostnames. Check language navigation, normal and error responses, and the hash of each active ZIP. Confirm the `www` redirect preserves the path. Record the confirmed release, checks and any open issues.
 
-Both workflows share a concurrency group. The current-version check cannot prevent a Firebase Console release between the check and the publication request. Use a single publisher.
+Both workflows share a concurrency group. The current-version check cannot prevent a Firebase Console release between the check and the publication request. Let one person run the release.
 
 If publication fails, read the `firebase-release-result` artifact or the workflow log and compare the requested version with the live release in Firebase Console before rerunning:
 
