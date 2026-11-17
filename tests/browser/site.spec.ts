@@ -260,6 +260,78 @@ test('published external apps can be reached in both languages without JavaScrip
   }
   await context.close();
 });
+test('the homepage distinguishes development projects and public skills from app downloads', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 320, height: 720 },
+  });
+  const page = await context.newPage();
+  const github = 'https://github.com/TaigaShinohara/';
+  for (const lang of ['ja', 'en'] as const) {
+    await page.goto(`http://127.0.0.1:4321/${lang}/`);
+    const projects = page.locator('#projects');
+    const skills = page.locator('#skills');
+    await expect(projects.getByRole('heading', { level: 3 })).toHaveText([
+      'AIMeter',
+      'ImageCrate',
+      'VideoHarbor',
+      'RabbitTracker',
+      'Modoreta',
+      'Scriptlet',
+      'kikkake',
+      'うろぼえ',
+      '顔写真 MBTI診断',
+      'QR一気よみ',
+      'KageCam',
+      'Deeplik',
+      'mori',
+      'Hoshizora Watch',
+      'Deeple',
+    ]);
+    await expect(projects.getByRole('link')).toHaveCount(6);
+    await expect(
+      projects.getByRole('article').filter({
+        has: page.getByRole('heading', { name: 'Deeple', exact: true }),
+      }),
+    ).toContainText(lang === 'ja' ? '提供終了' : 'Discontinued');
+    for (const repo of [
+      'AIMeter-public',
+      'ImageCrate-public',
+      'VideoHarbor-public',
+      'Scriptlet',
+      'kikkake',
+      'face-mbti',
+    ]) {
+      await expect(
+        projects.locator(`a[href="${github}${repo}"]`),
+      ).toBeVisible();
+    }
+    await page
+      .locator('.header-links')
+      .getByRole('link', {
+        name: lang === 'ja' ? 'スキル' : 'Skills',
+        exact: true,
+      })
+      .click();
+    await expect(page).toHaveURL(`http://127.0.0.1:4321/${lang}/#skills`);
+    await expect(skills.getByRole('heading', { level: 3 })).toHaveText([
+      'Concept-driven UX',
+      'Mobile Onboarding',
+      'Store Submission Skills',
+      'Easy i18n',
+      'Simple Glass',
+    ]);
+    await expect(
+      skills.locator(`a[href="${github}skills-updater"]`),
+    ).toBeVisible();
+    await expect(
+      page.locator('#projects a[download], #skills a[download]'),
+    ).toHaveCount(0);
+  }
+  await context.close();
+});
 test('skip link, CSP, 404 and write rejection', async ({
   page,
   request,

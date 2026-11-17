@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import AppCard from '../../components/AppCard.astro';
+import ShowcaseSection from '../../components/ShowcaseSection.astro';
+import { projects, skills } from '../../data/showcase';
 import { apps, locales, categories, type Locale } from '../../lib/catalog';
 import { scriptIntegrity } from '../../lib/security.mjs';
 export function getStaticPaths() {
@@ -120,16 +122,7 @@ const platforms = [
   </div>
   <section id="apps" class="catalog wrap">
     <div class="section-heading">
-      <div>
-        <p class="eyebrow" lang="en">
-          THE COLLECTION
-        </p>
-        <h2>
-          {ja
-            ? '暮らしと仕事に、小さなプラス。'
-            : 'A small addition to your everyday.'}
-        </h2>
-      </div>
+      <h2>{ja ? '配布中のアプリ' : 'Available apps'}</h2>
       <p>
         {String(apps.length).padStart(2, '0')}{' '}
         {ja ? 'アプリ' : 'APP' + (apps.length === 1 ? '' : 'S')}
@@ -172,6 +165,29 @@ const platforms = [
       ))}
     </div>
   </section>
+  <ShowcaseSection
+    id="projects"
+    title={
+      ja ? '開発中・過去のアプリ' : 'Apps in development and past projects'
+    }
+    items={projects}
+    lang={lang}
+  />
+  <ShowcaseSection
+    id="skills"
+    title={ja ? 'AIエージェント向けスキル' : 'Skills for AI agents'}
+    items={skills}
+    lang={lang}
+  >
+    <a
+      class="text-link showcase-more"
+      href="https://github.com/TaigaShinohara/skills-updater"
+      rel="noopener noreferrer"
+    >
+      {ja ? 'スキルのインストール・更新ツール' : 'Skill installer and updater'}
+      <span aria-hidden="true">↗</span>
+    </a>
+  </ShowcaseSection>
   <section class="promise wrap">
     <div class="promise-symbol" aria-hidden="true">
       d.
