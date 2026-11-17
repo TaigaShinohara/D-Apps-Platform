@@ -1,0 +1,66 @@
+{
+  "id": "profilemaker",
+  "name": "ProfileMaker -deedee-",
+  "status": "published",
+  "category": "creative",
+  "summary": {
+    "ja": "写真と言葉で、自分らしいプロフィールカードを。",
+    "en": "Make a profile card with your own photo and words."
+  },
+  "tagline": {
+    "ja": "自己紹介を、一枚に。",
+    "en": "Introduce yourself on one card."
+  },
+  "description": {
+    "ja": "写真とテキストを選ぶだけで、自己紹介に使えるオリジナルのプロフィールカードを作れます。",
+    "en": "Choose a photo and add your own text to create a personalized profile card."
+  },
+  "price": { "ja": "無料", "en": "Free" },
+  "requirements": {
+    "ja": "iPhone、iOS 13.0以降。",
+    "en": "iPhone with iOS 13.0 or later."
+  },
+  "permissions": {
+    "ja": "カードに使う写真やテキストは自分で選びます。写真は端末に表示される案内に従って選択してください。",
+    "en": "You choose the photo and text for your card. Follow the device prompts when selecting a photo."
+  },
+  "privacy": {
+    "ja": "App Storeの開発者申告によると、アプリの機能のためにメールアドレスやユーザコンテンツが収集され、利用者に関連付けられる場合があります。詳しくはApp Storeの「アプリのプライバシー」を確認してください。",
+    "en": "According to the developer’s App Store disclosure, email addresses and user content may be collected for app functionality and linked to your identity. See App Privacy on the App Store for details."
+  },
+  "limitations": {
+    "ja": "このページではiPhone版を案内しています。カードを共有する前に、写っている写真や記載した情報を確認してください。",
+    "en": "This listing covers the iPhone app. Check the photo and information on your card before sharing it."
+  },
+  "features": [
+    {
+      "ja": "カードに使う写真と文章を選ぶ",
+      "en": "Choose the photo and text for your card"
+    },
+    {
+      "ja": "自己紹介用のプロフィールカードを作る",
+      "en": "Create a profile card to introduce yourself"
+    }
+  ],
+  "instructions": [
+    {
+      "ja": "App Storeからアプリを入手します。",
+      "en": "Get the app from the App Store."
+    },
+    {
+      "ja": "写真とテキストを選び、プロフィールカードを作ります。",
+      "en": "Choose a photo and text to make your profile card."
+    }
+  ],
+  "updated": "2026-11-17",
+  "supportUrl": "https://chlorinated-gatsby-142.notion.site/247d6edf2c77806e88a3d639cae52348",
+  "license": "App Store",
+  "distributions": [
+    {
+      "kind": "store",
+      "platform": "iPhone",
+      "store": "apple",
+      "url": "https://apps.apple.com/jp/app/profilemaker-deedee/id6748630920"
+    }
+  ]
+}

@@ -413,7 +413,7 @@
     border: 1px solid var(--line);
     border-radius: 14px;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 1rem 1.4rem;
     align-items: center;
     transition: border-color 0.15s;
@@ -421,9 +421,24 @@
   .app-card:hover {
     border-color: #96afe0;
   }
-  .app-card > img {
+  .app-card > .app-icon {
     grid-column: 1;
     grid-row: 1 / 3;
+  }
+  .app-icon-fallback {
+    display: grid;
+    place-items: center;
+    width: 80px;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--soft);
+    color: var(--ink);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .detail-icon.app-icon-fallback {
+    width: 112px;
   }
   .app-card > header {
     grid-column: 2;
@@ -438,6 +453,7 @@
   .app-card h3 {
     font-size: 1.6rem;
     margin-top: 3px;
+    overflow-wrap: anywhere;
   }
   .app-card h3 a {
     color: var(--ink);
@@ -458,7 +474,7 @@
     margin-inline: 0.3rem;
   }
   @container (max-width: 550px) {
-    .app-card > img {
+    .app-card > .app-icon {
       grid-row: 1;
     }
     .app-card > div {
@@ -883,7 +899,8 @@
     .app-heading {
       gap: 16px;
     }
-    .detail-icon {
+    .detail-icon,
+    .detail-icon.app-icon-fallback {
       width: 80px;
     }
     .app-tagline {

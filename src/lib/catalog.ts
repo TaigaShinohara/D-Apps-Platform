@@ -56,6 +56,34 @@ export const distributionSchema = z
         url: storeUrl,
       })
       .strict(),
+    z
+      .object({
+        kind: z.literal('web'),
+        platform: z.literal('Web'),
+        url: httpsUrl.refine((value) => {
+          const url = new URL(value);
+          return (
+            url.hostname === 'taigashinohara.github.io' &&
+            /^\/[a-z0-9][a-z0-9-]*\/$/.test(url.pathname)
+          );
+        }, 'Use the publisher’s GitHub Pages project URL.'),
+      })
+      .strict(),
+    z
+      .object({
+        kind: z.literal('github-preview'),
+        platform: text,
+        url: httpsUrl.refine((value) => {
+          const url = new URL(value);
+          return (
+            url.hostname === 'github.com' &&
+            /^\/TaigaShinohara\/[\w.-]+\/releases\/tag\/v\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(
+              url.pathname,
+            )
+          );
+        }, 'Use a versioned GitHub release page from the publisher.'),
+      })
+      .strict(),
   ])
   .superRefine((value, ctx) => {
     const url = new URL(value.kind === 'direct' ? value.source : value.url);
@@ -78,7 +106,7 @@ export const distributionSchema = z
             'Direct releases must use an approved, versioned publisher asset.',
         });
       }
-    } else {
+    } else if (value.kind === 'store') {
       const productPaths = {
         apple: /^\/(?:[a-z]{2}\/)?app\/(?:[^/]+\/)?id\d+\/?$/,
         google: /^\/store\/apps\/details$/,
@@ -126,9 +154,13 @@ export const appSchema = z
     features: z.array(bilingual).min(1),
     instructions: z.array(bilingual).min(1),
     updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    sourceUrl: httpsUrl,
+    sourceUrl: httpsUrl.optional(),
     supportUrl: httpsUrl,
     license: text,
+    iconFallback: z
+      .string()
+      .regex(/^[A-Z]{1,2}$/)
+      .optional(),
     distributions: z.array(distributionSchema).min(1),
   })
   .strict();

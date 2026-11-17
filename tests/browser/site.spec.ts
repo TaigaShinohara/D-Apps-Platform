@@ -188,6 +188,73 @@ test('critical navigation and download work without JavaScript', async ({
   await expect(page).toHaveURL(/\/en\/apps\/oneclip\//);
   await context.close();
 });
+test('published external apps can be reached in both languages without JavaScript', async ({
+  browser,
+  request,
+}) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 320, height: 720 },
+  });
+  const page = await context.newPage();
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  const listings = [
+    {
+      id: 'profilemaker',
+      name: 'ProfileMaker -deedee-',
+      url: 'https://apps.apple.com/jp/app/profilemaker-deedee/id6748630920',
+      ja: 'App Storeで見る',
+      en: 'View on App Store',
+    },
+    {
+      id: 'yoriai',
+      name: 'yoriAI',
+      url: 'https://apps.apple.com/jp/app/yoriai/id6758237138',
+      ja: 'App Storeで見る',
+      en: 'View on App Store',
+    },
+    {
+      id: 'personal-color-check',
+      name: 'Personal Color Check',
+      url: 'https://taigashinohara.github.io/personal-color-check/',
+      ja: 'ブラウザで使う',
+      en: 'Open in browser',
+    },
+    {
+      id: 'charmshelf',
+      name: 'CharmShelf',
+      url: 'https://github.com/TaigaShinohara/CharmShelf/releases/tag/v1.0.12-oss.2',
+      ja: 'GitHubでプレビュー版を見る',
+      en: 'View preview on GitHub',
+    },
+  ];
+  for (const listing of listings) {
+    await page.goto('http://127.0.0.1:4321/ja/');
+    const card = page.locator('[data-app-card]').filter({
+      has: page.getByRole('heading', { name: listing.name, exact: true }),
+    });
+    if (listing.id === 'charmshelf')
+      await expect(card).toContainText('プレビュー版');
+    await card.getByRole('link', { name: listing.name, exact: true }).click();
+    for (const lang of ['ja', 'en'] as const) {
+      await expect(page).toHaveURL(
+        `http://127.0.0.1:4321/${lang}/apps/${listing.id}/`,
+      );
+      expect(sitemap).toContain(
+        `${canonicalOrigin}/${lang}/apps/${listing.id}/`,
+      );
+      const link = page.getByRole('link', { name: listing[lang], exact: true });
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute('href', listing.url);
+      expect(await link.getAttribute('download')).toBeNull();
+      await link.focus();
+      await expect(link).toBeFocused();
+      if (lang === 'ja')
+        await page.locator('.language-switch a[lang="en"]').click();
+    }
+  }
+  await context.close();
+});
 test('skip link, CSP, 404 and write rejection', async ({
   page,
   request,

@@ -1,0 +1,71 @@
+{
+  "id": "personal-color-check",
+  "name": "Personal Color Check",
+  "status": "published",
+  "category": "utilities",
+  "summary": {
+    "ja": "写真から、ブルベ・イエベと似合う色の目安をチェック。",
+    "en": "Explore your color undertone and palette from a photo."
+  },
+  "tagline": {
+    "ja": "似合う色を、画面で試す。",
+    "en": "Try out colors on screen."
+  },
+  "description": {
+    "ja": "顔写真の色を測り、ブルベ・イエベと春夏秋冬の4タイプの目安を表示します。写真の顔まわりに色を合わせて、パレットを見比べられます。",
+    "en": "Measure color from a face photo to get an estimate of your undertone and seasonal palette. Compare colors around your face in the preview."
+  },
+  "price": { "ja": "無料・オープンソース", "en": "Free and open source" },
+  "requirements": {
+    "ja": "JavaScriptが使えるWebブラウザ。",
+    "en": "A web browser with JavaScript enabled."
+  },
+  "permissions": {
+    "ja": "撮影機能を使う場合だけブラウザでカメラを許可します。保存済みの写真でも試せます。",
+    "en": "Allow camera access only if you want to take a photo in the browser. You can also select an existing photo."
+  },
+  "privacy": {
+    "ja": "写真はブラウザ内で処理され、アプリは写真を外部へ送信・保存しません。Web版は表示用フォントの取得にGoogle Fontsへ接続します。",
+    "en": "Photos are processed in your browser. The app does not send or store them. The web app connects to Google Fonts to load typefaces."
+  },
+  "limitations": {
+    "ja": "結果は目安です。照明、カメラの補正、メイクなどで結果が変わります。",
+    "en": "Results are estimates and can change with lighting, camera processing, and makeup."
+  },
+  "features": [
+    {
+      "ja": "最大3枚の写真を使って色をチェック",
+      "en": "Use up to three photos to check your colors"
+    },
+    {
+      "ja": "顔まわりでパレットの色を見比べる",
+      "en": "Compare palette colors around your face"
+    },
+    {
+      "ja": "判定に使った色の特徴を確認する",
+      "en": "See which color measurements informed the estimate"
+    }
+  ],
+  "instructions": [
+    {
+      "ja": "ブラウザでWeb版を開きます。",
+      "en": "Open the web app in your browser."
+    },
+    {
+      "ja": "自然光で撮った写真を選び、結果とパレットを見比べます。",
+      "en": "Select a photo taken in natural light and explore the result and palette."
+    }
+  ],
+  "updated": "2026-11-17",
+  "sourceUrl": "https://github.com/TaigaShinohara/personal-color-check",
+  "supportUrl": "https://github.com/TaigaShinohara/personal-color-check/issues",
+  "license": "MIT",
+  "iconFallback": "PC",
+  "distributions": [
+    {
+      "kind": "web",
+      "platform": "Web",
+      "url": "https://taigashinohara.github.io/personal-color-check/"
+    }
+  ]
+}
