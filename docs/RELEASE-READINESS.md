@@ -10,7 +10,7 @@
 - OneClip 1.0.1：macOS 14 以降の Universal 版、無料、MIT。正式 ZIP を加工せず直接配布。元リリースとアプリ内更新先を維持。
 - ファイル：`OneClip-1.0.1.zip`、3,821,021 bytes。
 - SHA-256：`231818840a6e122cc5eb7a2743cf236a1608a62472a6df6140f167e4114e29ed`。
-- 予定 URL：`https://deepledeeple.com/downloads/oneclip/1.0.1/OneClip-1.0.1.zip`。まだ公開されていません。
+- 予定 URL：`https://dobulab.com/downloads/oneclip/1.0.1/OneClip-1.0.1.zip`。まだ公開されていません。
 - ソース：<https://github.com/TaigaShinohara/D-Apps-Platform>。サイト独自コードは MIT、素材とアプリの権利は [別記](../THIRD-PARTY.md)。
 
 ## 見積りの前提（2026-11-17）
@@ -47,7 +47,7 @@ Route 53 の既存 hosted zone/DNS 料金は Google クレジットの対象外�
 | 本番配信                        | HTTPS、apex/www/標準ホスト、全応答ヘッダー、ZIP ハッシュ、404/非対応メソッド、実際の停止と復旧は未検証                                    |
 | サイトの表示・操作              | 日英全ページの自動検査、320px/200%文字、JS無効、Safari実アプリのキーボード導線と画面確認を実施。詳細は検証記録                            |
 | 人による利用確認                | VoiceOverは起動を試したが音声/ローターを検証できず元のオフに復元。実モバイル・読み上げの体験確認は未実施                                  |
-| ドメイン接続                    | [接続確認資料](DOMAIN-CUTOVER.md)に公開DNS・既存メール保護・実行順・切戻しを記録。変更なしのAPI検証は成功。接続先の最終値は実登録時に取得 |
+| ドメイン接続                    | Firebaseに `dobulab.com` と `www` を登録済み。[接続確認資料](DOMAIN-CUTOVER.md)に実行順と切戻しを記録。Route 53の実ゾーン照合と適用が残る |
 | OneClip 基本動作                | 正式配布物のハッシュ・署名・公証は検証。新規利用者の起動・撮影・保存は公開前に合成データで確認                                            |
 
 画面は `docs/screens/`、公開・停止・復旧は [DEPLOYMENT.md](DEPLOYMENT.md)、認証と特典は [GOOGLE-CLOUD-AUTH.md](GOOGLE-CLOUD-AUTH.md)を参照してください。

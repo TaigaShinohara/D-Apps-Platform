@@ -11,7 +11,9 @@ interface Props {
 }
 const { lang, title, description, path = '', noindex = false } = Astro.props;
 const ja = lang === 'ja';
-const canonical = `https://deepledeeple.com/${lang}/${path}`;
+const jaUrl = new URL(`/ja/${path}`, Astro.site).href;
+const enUrl = new URL(`/en/${path}`, Astro.site).href;
+const canonical = ja ? jaUrl : enUrl;
 const links = ja
   ? [
       ['about', 'D-Appsについて'],
@@ -42,21 +44,9 @@ const links = ja
     {noindex && <meta name="robots" content="noindex" />}
     <title>{title} | D-Apps</title>
     <link rel="canonical" href={canonical} />
-    <link
-      rel="alternate"
-      hreflang="ja"
-      href={`https://deepledeeple.com/ja/${path}`}
-    />
-    <link
-      rel="alternate"
-      hreflang="en"
-      href={`https://deepledeeple.com/en/${path}`}
-    />
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href={`https://deepledeeple.com/ja/${path}`}
-    />
+    <link rel="alternate" hreflang="ja" href={jaUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={jaUrl} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:title" content={`${title} | D-Apps`} />
     <meta property="og:description" content={description} />

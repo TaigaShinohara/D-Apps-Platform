@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://deepledeeple.com',
+  site: 'https://dobulab.com',
   output: 'static',
   trailingSlash: 'always',
   build: { inlineStylesheets: 'never' },

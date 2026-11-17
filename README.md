@@ -1,6 +1,6 @@
 # D-Apps
 
-An open, bilingual app directory for deepledeeple.com. Built around clear distribution information and no visitor tracking.
+An open, bilingual app directory for dobulab.com. Built around clear distribution information and no visitor tracking.
 
 D-Apps は、アプリの用途・配布元・データの扱いを確認してダウンロードできる、Astro + TypeScript の静的サイトです。日本語 `/ja/` と英語 `/en/` に対応し、最初の掲載アプリは OneClip 1.0.1 です。
 

@@ -1,31 +1,29 @@
-# deepledeeple.com の公開・DNS接続確認資料
+# dobulab.com の公開・DNS接続確認資料
 
-2026-11-17。配信先は Firebase Hosting の専用サイト `d-apps-deepledeeple`。この資料の作成では Hosting release、カスタムドメイン登録、DNS変更を行っていません。ドメイン登録とネームサーバーは Route 53 のまま使用します。
+2026-11-17。正規URLは `https://dobulab.com`、`www.dobulab.com` は正規URLへの301転送として接続します。配信先は既存の Firebase Hosting サイト `d-apps-deepledeeple` です。登録とDNSの管理は Route 53 を使います。旧 `deepledeeple.com` 向けの変更案は適用対象から外しています。
 
 ## 読み取りで確認した現状
 
-2026-11-17 05:10 UTC に公開DNSを照会しました。記録はローカルの `.artifacts/qa/site-readiness/dns-before.json` に保存しています。これは公開応答の確認であり、Route 53 のゾーン全体を取得した結果ではありません。
+2026-11-17に公開DNSを照会し、Route 53 の委任を確認しました。切替前の状態を把握するための照会で、ゾーン全体の設定は対象アカウントで確認します。
 
-| 名前                   | 種別                              | 公開応答                                                                                           | 接続時の扱い      |
-| ---------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------- |
-| `deepledeeple.com`     | NS                                | `ns-508.awsdns-63.com`, `ns-939.awsdns-53.net`, `ns-1428.awsdns-50.org`, `ns-1814.awsdns-34.co.uk` | 維持              |
-| `deepledeeple.com`     | MX / TTL 300                      | `10 inbound-smtp.us-east-1.amazonaws.com.`                                                         | メール用。維持    |
-| `deepledeeple.com`     | TXT / TTL 300                     | `v=spf1 include:amazonses.com ~all`                                                                | SPF。置換せず維持 |
-| `deepledeeple.com`     | A / AAAA / CNAME / CAA            | 応答なし                                                                                           | 実行直前に再確認  |
-| `www.deepledeeple.com` | A / AAAA / CNAME / MX / TXT / CAA | 応答なし                                                                                           | 実行直前に再確認  |
+| 名前              | 種別                      | 公開応答                                                                                           | 接続時の扱い     |
+| ----------------- | ------------------------- | -------------------------------------------------------------------------------------------------- | ---------------- |
+| `dobulab.com`     | NS                        | `ns-1403.awsdns-47.org`, `ns-1564.awsdns-03.co.uk`, `ns-351.awsdns-43.com`, `ns-873.awsdns-45.net` | 維持             |
+| `dobulab.com`     | A / AAAA / MX / TXT / CAA | 該当レコードの回答なし                                                                             | 実行直前に再確認 |
+| `www.dobulab.com` | A / CNAME                 | NXDOMAIN                                                                                           | 実行直前に再確認 |
 
-Firebase REST の [customDomains.create](https://firebase.google.com/docs/reference/hosting/rest/v1beta1/projects.sites.customDomains/create) を `validateOnly=true` で実行し、apex と `www`（`redirectTarget=deepledeeple.com`）の両方が HTTP 200 を返しました。直後の一覧は空で、カスタムドメインが作成されていないことを確認しました。この検証は証明書の発行・接続完了を意味しません。dry-run の操作IDは永続化されず、読み戻しは404でした。接続先のIPや証明書チャレンジは返されていません。
+Firebaseで `dobulab.com` と `www.dobulab.com` の登録と転送先を読み戻しました。所有権・証明書は検証待ちです。DNS要求値と証明書の検証値は非公開の作業記録に保存しています。適用前にFirebaseの最新値と対象ゾーンの現状を照合します。
 
 ## 公開承認後に確定・実行する差分
 
 1. 公開する main コミット、成功したCI、非公開ステージの版名・bundle digestを照合する。OneClipの基本動作と、人による残りの利用確認を完了する。初回は現在の live が `NONE` であることを再確認する。
 2. Route 53 の既存ゾーンから、対象名の全レコード・TTL・Alias・ルーティングポリシーを非公開ファイルに退避する。公開DNSだけで「他のレコードがない」と判断しない。AWS rootによる常用運用は行わず、対象ゾーンに限定した運用者の接続で実施する。
-3. Firebase に apex を登録し、`www` は apex への301転送として登録する。[公式の接続手順](https://firebase.google.com/docs/hosting/custom-domain)とサービスが返す `requiredDnsUpdates` を照合する。**実際に返された値だけ**で Route 53 の変更バッチを作る。一般的なIPや未取得の検証値を埋めて実行しない。
-4. TXTの所有権確認が要求された場合、既存SPFと同じTXTレコードセットに独立した値として追加する。既存値を消さず、SPF文字列の中へ連結しない。証明書用の追加TXT/CAAが必要なら、その名前と値も差分に含める。DKIM・DMARC・MX・NS・SOAや他のサブドメインは変更しない。
+3. Firebase で `dobulab.com` と `www.dobulab.com` の登録、`www` の転送先が `dobulab.com` であることを確認する。[公式の接続手順](https://firebase.google.com/docs/hosting/custom-domain)と `requiredDnsUpdates` を照合し、サービスが返した値で Route 53 の変更案を確定する。
+4. 所有権確認用のTXTは独立した値として追加する。同名のTXTが既にある場合は全値を引き継ぐ。証明書用のTXT/CAAが必要なら、その名前と値も差分に含める。DKIM・DMARC・MX・NS・SOAや他のサブドメインは維持する。
 5. 承認された Hosting release を公開する。この時点で `d-apps-deepledeeple.web.app` と `d-apps-deepledeeple.firebaseapp.com` に一般公開される。標準ホストでもHTTPS・日英ページ・404・ダウンロードのハッシュを検証する。
-6. 対象名だけのDNS変更を適用し、権威DNS・公開DNS・Firebaseのドメイン/証明書状態を確認する。TLSエラーを回避して公開成功扱いにしない。現在はA等が未設定のため旧Webサイトからの移行ではないが、メール配信への影響がないことを確認する。
+6. 承認されたDNS差分を適用し、権威DNS・公開DNS・Firebaseのドメイン/証明書状態を確認する。HTTPS接続と既存サービスへの影響も確認する。
 
-ここまでの準備時点では、最終的なIP・所有権/証明書値とAWSゾーン内の差分は未確定です。これはサイトコードの不足ではなく、承認後の実接続に伴う確認です。自動的なNS移管・DNS全置換は行いません。
+DNSの最終差分はFirebaseから取得した名前・種別・値と、Route 53の対象ゾーンを照合して確定します。本番公開とDNS適用は実行承認後に進めます。
 
 ## 公開直後の確認
 
