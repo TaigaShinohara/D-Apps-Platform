@@ -30,7 +30,7 @@ const remote = {
   labels: releaseLabels(commit, config, hashes),
 };
 
-test('staging uploads gzip bytes by their hashes, finalizes, and never publishes', async () => {
+test('staging uploads gzip bytes, reads back finalized files/config, and never publishes', async () => {
   const calls: string[] = [];
   let uploaded = 0;
   const api = async (method: string, path: string, data: any) => {
@@ -43,6 +43,11 @@ test('staging uploads gzip bytes by their hashes, finalizes, and never publishes
         uploadRequiredHashes: Object.values(hashes),
       };
     }
+    if (method === 'GET' && path === version) return remote;
+    if (method === 'GET' && path.includes('/files?'))
+      return {
+        files: Object.entries(hashes).map(([path, hash]) => ({ path, hash })),
+      };
     assert.equal(data.status, 'FINALIZED');
     return { status: 'FINALIZED' };
   };
@@ -59,6 +64,8 @@ test('staging uploads gzip bytes by their hashes, finalizes, and never publishes
     files,
   });
   assert.equal(uploaded, 2);
+  assert.ok(calls.includes(`GET ${version}`));
+  assert.ok(calls.some((call) => call.startsWith(`GET ${version}/files?`)));
   assert.equal(
     calls.some((call) => call.includes('/releases')),
     false,
@@ -146,6 +153,32 @@ function fakeRelease({
   };
   return { api, published: () => published };
 }
+test('staging rejects finalized versions whose remote config, files or commit differ', async () => {
+  for (const options of [
+    { changedConfig: true },
+    { extraFile: true },
+    { wrongCommit: true },
+  ]) {
+    const fake = fakeRelease(options);
+    await assert.rejects(
+      stageVersion({
+        api: async (method: string, path: string) => {
+          if (path === `sites/${site}/versions`) return { name: version };
+          if (path.endsWith(':populateFiles')) return {};
+          if (method === 'PATCH') return { status: 'FINALIZED' };
+          return fake.api(method, path);
+        },
+        upload: async () =>
+          assert.fail('Already uploaded files need no upload'),
+        site,
+        commit,
+        config,
+        files,
+      }),
+    );
+    assert.equal(fake.published(), false);
+  }
+});
 test('publication refuses changed config, unexpected files, commit and live-version mismatch', async () => {
   for (const options of [
     { changedConfig: true },

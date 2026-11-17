@@ -84,7 +84,7 @@ resource "google_iam_workload_identity_pool" "github" {
   provider                  = google-beta
   project                   = var.project_id
   workload_identity_pool_id = "d-apps-github"
-  display_name              = "D-Apps protected release workflows"
+  display_name              = "D-Apps GitHub publishing"
   depends_on                = [google_project_service.required]
 }
 
