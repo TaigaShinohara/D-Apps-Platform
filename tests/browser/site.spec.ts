@@ -3,6 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { appDetails } from '../../src/lib/catalog';
+import { projects as showcasedProjects } from '../../src/data/showcase';
 import {
   readDirectDownloads,
   readRevocations,
@@ -36,6 +37,9 @@ for (const lang of ['ja', 'en']) {
       .getByRole('link')
       .click();
     await expect(page).toHaveURL(new RegExp(`/${lang}/apps/oneclip/`));
+    await page.locator('.app-hero a[href="#get-app"]').click();
+    await expect(page).toHaveURL(/#get-app$/);
+    await expect(page.locator('#get-app a[download]')).toBeVisible();
     const other = lang === 'ja' ? 'en' : 'ja';
     await page.locator(`.language-switch a[lang="${other}"]`).click();
     await expect(page).toHaveURL(new RegExp(`/${other}/apps/oneclip/`));
@@ -74,6 +78,9 @@ for (const lang of ['ja', 'en']) {
     for (const path of [
       `/${lang}/`,
       ...appDetails.map((app) => `/${lang}/apps/${app.id}/`),
+      ...['aimeter', 'imagecrate', 'mori', 'kagecam', 'face-mbti'].map(
+        (id) => `/${lang}/projects/${id}/`,
+      ),
       ...['about', 'privacy', 'safety', 'license', 'support'].map(
         (slug) => `/${lang}/${slug}/`,
       ),
@@ -262,6 +269,7 @@ test('published external apps can be reached in both languages without JavaScrip
 });
 test('the homepage distinguishes development projects and public skills from app downloads', async ({
   browser,
+  request,
 }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
@@ -269,6 +277,7 @@ test('the homepage distinguishes development projects and public skills from app
   });
   const page = await context.newPage();
   const github = 'https://github.com/TaigaShinohara/';
+  const sitemap = await (await request.get('/sitemap.xml')).text();
   for (const lang of ['ja', 'en'] as const) {
     await page.goto(`http://127.0.0.1:4321/${lang}/`);
     const projects = page.locator('#projects');
@@ -291,7 +300,14 @@ test('the homepage distinguishes development projects and public skills from app
       'Deeple',
       'ハイパーCapsLock',
     ]);
-    await expect(projects.getByRole('link')).toHaveCount(7);
+    await expect(projects.getByRole('link')).toHaveCount(23);
+    for (const project of showcasedProjects) {
+      const route = `/${lang}/projects/${project.id}/`;
+      await expect(
+        projects.getByRole('link', { name: project.name, exact: true }),
+      ).toHaveAttribute('href', route);
+      expect(sitemap).toContain(canonicalOrigin + route);
+    }
     await expect(
       projects.getByRole('article').filter({
         has: page.getByRole('heading', { name: 'Deeple', exact: true }),
@@ -324,6 +340,7 @@ test('the homepage distinguishes development projects and public skills from app
       'Store Submission Skills',
       'Easy i18n',
       'Simple Glass',
+      'Minimal Information Design',
     ]);
     await expect(
       skills.locator(`a[href="${github}skills-updater"]`),
@@ -331,6 +348,22 @@ test('the homepage distinguishes development projects and public skills from app
     await expect(
       page.locator('#projects a[download], #skills a[download]'),
     ).toHaveCount(0);
+    await projects
+      .getByRole('link', { name: 'ImageCrate', exact: true })
+      .click();
+    await expect(page).toHaveURL(
+      `http://127.0.0.1:4321/${lang}/projects/imagecrate/`,
+    );
+    const visual = page.locator('.app-hero-media img');
+    await expect(visual).toBeVisible();
+    await expect(visual).toHaveAttribute('alt', /ImageCrate/);
+    await expect
+      .poll(() => visual.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(0);
+    await expect(page.locator('.download-panel .button')).toHaveAttribute(
+      'href',
+      github + 'ImageCrate-public',
+    );
   }
   await context.close();
 });

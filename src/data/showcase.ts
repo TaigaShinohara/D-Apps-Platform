@@ -5,15 +5,32 @@ type Bilingual = Record<Locale, string>;
 export interface ShowcaseEntry {
   name: string;
   summary: Bilingual;
-  platform?: string;
   repository?: string;
   members?: readonly string[];
-  status?: Bilingual;
 }
 
-export const projects: readonly ShowcaseEntry[] = [
+export interface ProjectEntry extends ShowcaseEntry {
+  id: string;
+  platform?: string;
+  status?: Bilingual;
+  detail: Bilingual;
+}
+
+export function projectStatus(project: ProjectEntry, lang: Locale) {
+  if (project.status) return project.status[lang];
+  if (project.repository)
+    return lang === 'ja' ? 'ソース公開' : 'Source available';
+  return lang === 'ja' ? '配布準備中' : 'In development';
+}
+
+export const projects: readonly ProjectEntry[] = [
   {
+    id: 'aimeter',
     name: 'AIMeter',
+    detail: {
+      ja: 'メニューバーから、対応するAIツールの利用状況を手早く確認できます。Macのウィジェットにも表示できます。',
+      en: 'Check supported AI tools at a glance from the menu bar, or put the information on your Mac desktop with a widget.',
+    },
     platform: 'macOS',
     repository: 'AIMeter-public',
     summary: {
@@ -22,7 +39,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'imagecrate',
     name: 'ImageCrate',
+    detail: {
+      ja: 'ページ内の画像を一覧に集め、大きなプレビューで候補を確認してから、使いたい画像だけを保存できます。',
+      en: 'Gather images from a page into a grid, inspect the candidates at a larger size, and save the ones you need.',
+    },
     platform: 'Chrome / Safari',
     repository: 'ImageCrate-public',
     summary: {
@@ -31,7 +53,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'videoharbor',
     name: 'VideoHarbor',
+    detail: {
+      ja: '動画を取得できるページではファイルを保存し、必要なシーンだけを残したいときは録画範囲を選べます。使える方法はサイトによって変わります。',
+      en: 'Save a video file where supported, or choose a segment to record when you only need a short scene. Available modes depend on the site.',
+    },
     platform: 'Chrome / Safari',
     repository: 'VideoHarbor-public',
     summary: {
@@ -40,7 +67,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'rabbittracker',
     name: 'RabbitTracker',
+    detail: {
+      ja: 'チェック式と数値式の習慣を記録できます。達成だけでなく、休んだ日や小さく再開した日も振り返れます。',
+      en: 'Track checklists or numeric habits. Look back at rest days and small restarts as well as completions.',
+    },
     platform: 'iOS / Android',
     summary: {
       ja: '習慣の小さな達成や休みを記録し、自分のペースで再開するためのアプリ。',
@@ -48,7 +80,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'modoreta',
     name: 'Modoreta',
+    detail: {
+      ja: '対象に選んだアプリを開こうとすると、ひと呼吸する画面が現れます。今は開かずに戻るか、5分だけ使うかを自分で選べます。',
+      en: 'A brief pause appears when you open an app you have selected. You then choose whether to go back or use it for five minutes.',
+    },
     platform: 'Android',
     summary: {
       ja: 'つい開いてしまうアプリの前でひと呼吸。今使うかどうかを自分で選べます。',
@@ -56,7 +93,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'scriptlet',
     name: 'Scriptlet',
+    detail: {
+      ja: '書いたJavaScriptを使って、Androidのホーム画面に表示するウィジェットを作れます。',
+      en: 'Use a script you write to create a widget that lives on your Android home screen.',
+    },
     platform: 'Android',
     repository: 'Scriptlet',
     summary: {
@@ -65,7 +107,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'kikkake',
     name: 'kikkake',
+    detail: {
+      ja: '最初に動き出す条件を選び、続けて行う操作を組み合わせます。仕組みを一つずつ組み立てられます。',
+      en: 'Start with the condition that triggers an automation and pair it with the action to run. Build one routine at a time.',
+    },
     platform: 'Android',
     repository: 'kikkake',
     summary: {
@@ -74,7 +121,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'uroboe',
     name: 'うろぼえ',
+    detail: {
+      ja: '書き残したメモを、記憶が薄れてきそうな時期に読み返すためのアプリです。',
+      en: 'Revisit notes when the ideas they capture are likely to start fading from memory.',
+    },
     platform: 'Android',
     summary: {
       ja: '忘却曲線をもとに、忘れそうな頃に自分のメモを見返せる。',
@@ -82,7 +134,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'face-mbti',
     name: '顔写真 MBTI診断',
+    detail: {
+      ja: '写真の明るさや色などをブラウザで判定します。結果は写真の写り方によって変わるエンタメ向けです。',
+      en: 'The browser reads properties such as brightness and color. The result is for entertainment and changes with how the photo was taken.',
+    },
     platform: 'Web',
     repository: 'face-mbti',
     summary: {
@@ -91,7 +148,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'qr-ikki-yomi',
     name: 'QR一気よみ',
+    detail: {
+      ja: '複数あるQRコードを順番に確認したいときに、読み取りを繰り返せるAndroidアプリです。',
+      en: 'An Android app for scanning a series of QR codes in one session.',
+    },
     platform: 'Android',
     summary: {
       ja: '複数のQRコードを続けて読み取るためのアプリ。',
@@ -99,7 +161,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'kagecam',
     name: 'KageCam',
+    detail: {
+      ja: '写真のすぐあとに短い音を録ることで、その瞬間を目と耳の両方で振り返れます。',
+      en: 'Record a short sound right after taking a photo, so you can revisit what the moment sounded like as well as what it looked like.',
+    },
     platform: 'Android',
     summary: {
       ja: 'シャッターを切ったあと、その場の音を短く録って写真と一緒に残すカメラ。',
@@ -107,7 +174,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'deeplik',
     name: 'Deeplik',
+    detail: {
+      ja: 'プロフィールから友だちとつながり、1対1の会話やグループトークを始められるように設計しました。',
+      en: 'The app was designed around meeting friends through profiles and talking in private or group conversations.',
+    },
     platform: 'iOS / Android',
     status: { ja: '開発休止中', en: 'Development paused' },
     summary: {
@@ -116,7 +188,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'mori',
     name: 'mori',
+    detail: {
+      ja: '安静時の心拍数を自分の基準と比べて確認します。日々のウェルネスを振り返るための参考情報です。',
+      en: 'Compare resting heart rate with your personal baseline as a reference for reflecting on daily wellbeing.',
+    },
     platform: 'Android / Wear OS / iOS / watchOS',
     summary: {
       ja: '安静時の心拍数を自分の過去の値と比べ、日々の体調を振り返るウェルネスアプリ。',
@@ -124,7 +201,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'hoshizora-watch',
     name: 'Hoshizora Watch',
+    detail: {
+      ja: '腕元で今の月相を見たり、次の流星群の時期を確かめたりできます。月明かりの表示は照面率をもとにした目安です。',
+      en: 'Check the current Moon phase on your wrist and see when the next meteor shower is due. The moonlight indicator estimates illumination from the Moon’s lit fraction.',
+    },
     platform: 'Android / Wear OS / iOS / watchOS',
     summary: {
       ja: '月齢や次の流星群を、スマホや腕時計から確認できる星空時計。',
@@ -132,7 +214,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'deeple',
     name: 'Deeple',
+    detail: {
+      ja: '相手に感じた印象をラベルで伝えると、集まったラベルがその人のプロフィールになっていく交流サービスでした。',
+      en: 'Friends could describe their impressions with tags. Over time, the tags they received became part of their profile.',
+    },
     status: { ja: '提供終了', en: 'Discontinued' },
     summary: {
       ja: '友だち同士でお互いの印象をラベルにし、そのラベルがプロフィールになるSNS。',
@@ -140,7 +227,12 @@ export const projects: readonly ShowcaseEntry[] = [
     },
   },
   {
+    id: 'hyper-capslock',
     name: 'ハイパーCapsLock',
+    detail: {
+      ja: 'スターター8点（Hyper+CでAIチャット、Hyper+Enterで送信、Hyper+1/2/3で固定席の切替、Hyper+Q/Wでウィンドウ左右、Hyper+Tでターミナル、Hyper+Spaceでランチャー、Hyper+Vでクリップボード履歴）を、macOSはKarabiner-Elements設定、WindowsはKanata設定とAutoHotkey v2スクリプトで提供します。',
+      en: 'Provides the eight starter bindings (Hyper+C for AI chat, Hyper+Enter to send, Hyper+1/2/3 for pinned seats, Hyper+Q/W for window left/right, Hyper+T for the terminal, Hyper+Space for the launcher, Hyper+V for clipboard history) as a Karabiner-Elements config on macOS and Kanata plus AutoHotkey v2 scripts on Windows.',
+    },
     platform: 'macOS / Windows',
     repository: 'hyper-capslock',
     summary: {
@@ -195,6 +287,14 @@ export const skills: readonly ShowcaseEntry[] = [
     summary: {
       ja: '透け感のあるUIを、さまざまなプラットフォームで設計・実装するためのスキル。',
       en: 'Design and implement translucent glass effects across app and web platforms.',
+    },
+  },
+  {
+    name: 'Minimal Information Design',
+    repository: 'minimal-information-design-skill',
+    summary: {
+      ja: 'アプリの情報量を減らし、文字に頼らずアイコン・図形・操作UIで伝える。分割・折りたたみ・段階表示で、読まなくても直感的に使える設計にするスキル。',
+      en: 'A skill to reduce app information load — less text, more icons, shapes and UI, with paging, folding and progressive disclosure so apps feel intuitive without reading.',
     },
   },
 ];

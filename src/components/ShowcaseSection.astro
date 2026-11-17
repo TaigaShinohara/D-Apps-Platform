@@ -1,18 +1,20 @@
 ---
-import type { ShowcaseEntry } from '../data/showcase';
+import {
+  projectStatus,
+  type ProjectEntry,
+  type ShowcaseEntry,
+} from '../data/showcase';
 import type { Locale } from '../lib/catalog';
 
 interface Props {
   id: 'projects' | 'skills';
   title: string;
-  items: readonly ShowcaseEntry[];
+  items: readonly (ShowcaseEntry | ProjectEntry)[];
   lang: Locale;
 }
 
 const { id, title, items, lang } = Astro.props;
 const ja = lang === 'ja';
-const sourceAvailable = ja ? 'ソース公開' : 'Source available';
-const inDevelopment = ja ? '配布準備中' : 'In development';
 ---
 
 <section id={id} class="showcase wrap" aria-labelledby={`${id}-heading`}>
@@ -22,12 +24,17 @@ const inDevelopment = ja ? '配布準備中' : 'In development';
   <div class="app-grid">
     {items.map((item) => (
       <article class="showcase-card">
-        <h3>{item.name}</h3>
-        {(item.platform || item.status) && (
+        <h3>
+          {'id' in item ? (
+            <a href={`/${lang}/projects/${item.id}/`}>{item.name}</a>
+          ) : (
+            item.name
+          )}
+        </h3>
+        {'id' in item && (
           <p class="card-meta">
             {item.platform && `${item.platform} · `}
-            {item.status?.[lang] ??
-              (item.repository ? sourceAvailable : inDevelopment)}
+            {projectStatus(item, lang)}
           </p>
         )}
         <p class="card-summary">{item.summary[lang]}</p>

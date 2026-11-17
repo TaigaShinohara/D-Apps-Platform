@@ -1,0 +1,67 @@
+---
+import AppHero from '../../../components/AppHero.astro';
+import {
+  projects,
+  projectStatus,
+  type ProjectEntry,
+} from '../../../data/showcase';
+import Layout from '../../../layouts/Layout.astro';
+import { locales, type Locale } from '../../../lib/catalog';
+
+export function getStaticPaths() {
+  return locales.flatMap((lang) =>
+    projects.map((project) => ({
+      params: { lang, id: project.id },
+      props: { project },
+    })),
+  );
+}
+
+const { project } = Astro.props as { project: ProjectEntry };
+const lang = Astro.params.lang as Locale;
+const ja = lang === 'ja';
+const status = projectStatus(project, lang);
+---
+
+<Layout
+  lang={lang}
+  title={project.name}
+  description={project.summary[lang]}
+  path={`projects/${project.id}/`}
+>
+  <div class="wrap detail">
+    <a class="back-link" href={`/${lang}/#projects`}>
+      ← {ja ? '開発中・過去のアプリ' : 'Apps in development and past projects'}
+    </a>
+    <AppHero
+      id={project.id}
+      name={project.name}
+      meta={project.platform ?? status}
+      intro={project.summary[lang]}
+      lang={lang}
+    />
+    <div class="detail-columns">
+      <section class="detail-content project-overview">
+        <h2>{ja ? 'どんなアプリ？' : 'What it does'}</h2>
+        <p class="lead">{project.detail[lang]}</p>
+      </section>
+      <aside
+        class="download-panel"
+        aria-label={ja ? '公開情報' : 'Availability'}
+      >
+        <h2>{ja ? '公開状況' : 'Availability'}</h2>
+        <p>{status}</p>
+        {project.repository && (
+          <a
+            class="button"
+            href={`https://github.com/TaigaShinohara/${project.repository}`}
+            rel="noopener noreferrer"
+          >
+            {ja ? 'GitHubでソースを見る' : 'View source on GitHub'}
+            <span aria-hidden="true">↗</span>
+          </a>
+        )}
+      </aside>
+    </div>
+  </div>
+</Layout>

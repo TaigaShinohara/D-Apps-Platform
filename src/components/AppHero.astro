@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import '../styles/app-artwork.css';
+import { appArtwork } from '../data/app-artwork';
+import type { Locale } from '../lib/catalog';
+
+interface Props {
+  id: string;
+  name: string;
+  meta: string;
+  intro: string;
+  lang: Locale;
+  getLabel?: string;
+}
+
+const { id, name, meta, intro, lang, getLabel } = Astro.props;
+const art = appArtwork[id];
+---
+
+<header class:list={['app-hero', { 'app-hero-text': !art }]} data-brand={id}>
+  <div class="app-hero-copy">
+    {meta && <p class="app-hero-meta">{meta}</p>}
+    <h1 id="content" tabindex="-1">
+      {name}
+    </h1>
+    <p class="app-hero-intro">{intro}</p>
+    {getLabel && (
+      <a class="app-hero-get" href="#get-app">
+        {getLabel} <span aria-hidden="true">↓</span>
+      </a>
+    )}
+  </div>
+  {art && (
+    <figure class:list={['app-hero-media', `app-hero-${art.kind}`]}>
+      <Image
+        src={art.image}
+        alt={art.alt[lang]}
+        format="webp"
+        widths={[360, 720, art.image.width].filter(
+          (w, i, values) => w <= art.image.width && values.indexOf(w) === i,
+        )}
+        sizes={
+          art.kind === 'mark'
+            ? '240px'
+            : art.kind === 'phone'
+              ? '(max-width: 760px) 160px, 200px'
+              : '(max-width: 760px) 88vw, 560px'
+        }
+        loading="eager"
+        fetchpriority="high"
+      />
+      <figcaption>{art.caption[lang]}</figcaption>
+    </figure>
+  )}
+</header>

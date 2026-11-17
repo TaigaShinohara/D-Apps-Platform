@@ -1,0 +1,204 @@
+@layer components {
+  .app-hero {
+    --art-bg: #edf3f8;
+    --art-tint: #f7fafc;
+    --art-ink: #182839;
+    --art-accent: #31536e;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    column-gap: clamp(22px, 4vw, 58px);
+    row-gap: 24px;
+    padding: clamp(22px, 4vw, 64px);
+    margin-block-end: clamp(28px, 4vw, 58px);
+    min-block-size: 300px;
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--art-accent) 20%, transparent);
+    background: linear-gradient(125deg, var(--art-bg), var(--art-tint));
+    color: var(--art-ink);
+  }
+  .app-hero-text {
+    grid-template-columns: minmax(0, 1fr);
+    min-block-size: 240px;
+  }
+  .app-hero-copy {
+    min-inline-size: 0;
+    max-inline-size: 50rem;
+  }
+  .app-hero h1 {
+    font-size: clamp(1.9rem, 1.25rem + 3vw, 3.55rem);
+    line-height: 1.13;
+    letter-spacing: -0.035em;
+    overflow-wrap: anywhere;
+    margin-block: 0.25em 0.35em;
+  }
+  .app-hero-meta {
+    font-size: 0.79rem;
+    color: var(--art-accent);
+    font-weight: 650;
+  }
+  .app-hero-intro {
+    font-size: clamp(1rem, 0.92rem + 0.55vw, 1.37rem);
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+  .app-hero-get {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    min-block-size: 44px;
+    margin-block-start: 20px;
+    padding: 0.25em 0.9em;
+    border: 1px solid currentColor;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 650;
+    color: var(--art-ink);
+    text-decoration: none;
+  }
+  .app-hero-get:hover {
+    background: color-mix(in srgb, var(--art-ink) 9%, transparent);
+  }
+  .app-hero-get:focus-visible {
+    outline-color: var(--art-ink);
+  }
+  .app-hero-media {
+    min-inline-size: 0;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+  }
+  .app-hero-media img {
+    inline-size: auto;
+    object-fit: contain;
+    max-inline-size: 100%;
+    max-block-size: 390px;
+    border-radius: 13px;
+    box-shadow: 0 14px 35px rgb(12 22 44 / 14%);
+  }
+  .app-hero-phone img {
+    border-radius: 20px;
+    max-block-size: 400px;
+  }
+  .app-hero-mark img {
+    inline-size: min(100%, 15rem);
+    border-radius: 23%;
+  }
+  .app-hero-media figcaption {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--art-ink);
+  }
+  .project-overview h2 {
+    margin-block-end: 12px;
+  }
+  [data-brand='oneclip'] {
+    --art-bg: #e5eafa;
+    --art-tint: #f3f5fb;
+    --art-accent: #303c80;
+  }
+  [data-brand='charmshelf'] {
+    --art-bg: #e6edf9;
+    --art-tint: #f1f3ff;
+    --art-accent: #405187;
+  }
+  [data-brand='profilemaker'] {
+    --art-bg: #ffead9;
+    --art-tint: #fff6ec;
+    --art-ink: #412319;
+    --art-accent: #923a18;
+  }
+  [data-brand='yoriai'] {
+    --art-bg: #151314;
+    --art-tint: #432c22;
+    --art-ink: #f8ece4;
+    --art-accent: #efc28a;
+  }
+  [data-brand='personal-color-check'] {
+    --art-bg: #f7e8d9;
+    --art-tint: #fffbf6;
+    --art-ink: #34211f;
+    --art-accent: #8b462f;
+  }
+  [data-brand='aimeter'] {
+    --art-bg: #111626;
+    --art-tint: #243950;
+    --art-ink: #ebf7fb;
+    --art-accent: #82daef;
+  }
+  [data-brand='imagecrate'] {
+    --art-bg: #ebe5ff;
+    --art-tint: #f6f3ff;
+    --art-accent: #5340a6;
+  }
+  [data-brand='videoharbor'] {
+    --art-bg: #e3f1e9;
+    --art-tint: #f5fbf7;
+    --art-ink: #162e26;
+    --art-accent: #145844;
+  }
+  [data-brand='rabbittracker'] {
+    --art-bg: #f8e7f1;
+    --art-tint: #f1eafa;
+    --art-accent: #6d368c;
+  }
+  [data-brand='modoreta'] {
+    --art-bg: #103d36;
+    --art-tint: #1c594d;
+    --art-ink: #fff8ea;
+    --art-accent: #cbebdf;
+  }
+  [data-brand='scriptlet'],
+  [data-brand='kikkake'] {
+    --art-bg: #fae5ee;
+    --art-tint: #fff4f8;
+    --art-accent: #9b2351;
+  }
+  [data-brand='face-mbti'] {
+    --art-bg: #f1e1bd;
+    --art-tint: #fff6e1;
+    --art-ink: #153048;
+    --art-accent: #8e3c26;
+  }
+  [data-brand='deeplik'] {
+    --art-bg: #061225;
+    --art-tint: #143763;
+    --art-ink: #eff7ff;
+    --art-accent: #81c8ff;
+  }
+  [data-brand='mori'] {
+    --art-bg: #eaf2d7;
+    --art-tint: #fbf7e6;
+    --art-ink: #293621;
+    --art-accent: #3c5a2d;
+  }
+  [data-brand='hoshizora-watch'] {
+    --art-bg: #060a16;
+    --art-tint: #222244;
+    --art-ink: #fbf5df;
+    --art-accent: #d3ceff;
+  }
+  [data-brand='deeple'] {
+    --art-bg: #e8ddc6;
+    --art-tint: #f9efe1;
+    --art-ink: #27313c;
+    --art-accent: #833d31;
+  }
+}
+
+@layer responsive {
+  @media (max-width: 760px) {
+    .app-hero {
+      grid-template-columns: minmax(0, 1fr);
+      min-block-size: auto;
+      border-radius: 16px;
+    }
+    .app-hero-media img {
+      max-block-size: 330px;
+    }
+    .app-hero-mark img {
+      inline-size: min(100%, 11rem);
+    }
+  }
+}
