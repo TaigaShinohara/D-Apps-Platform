@@ -420,6 +420,15 @@
   .showcase-card h3 {
     font-size: 1.35rem;
   }
+  .showcase-card h3 a {
+    color: inherit;
+    text-decoration-color: var(--blue);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .showcase-card h3 a:hover {
+    color: var(--blue);
+  }
   .showcase-card .card-summary {
     margin-block-start: 0.65rem;
   }
@@ -460,9 +469,6 @@
     color: var(--ink);
     font-size: 1.5rem;
     font-weight: 700;
-  }
-  .detail-icon.app-icon-fallback {
-    width: 112px;
   }
   .app-card > header {
     grid-column: 2;
@@ -608,25 +614,6 @@
     padding-block: 10px;
     margin-bottom: 26px;
   }
-  .app-heading {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    align-items: center;
-    margin-bottom: 40px;
-  }
-  .app-heading h1 {
-    font-size: clamp(2.3rem, 2rem + 2vw, 3.5rem);
-    margin-block: 4px;
-    overflow-wrap: anywhere;
-  }
-  .app-heading > div {
-    min-inline-size: 0;
-  }
-  .app-tagline {
-    color: var(--muted);
-    font-size: 1.1rem;
-  }
   .detail-columns {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 340px;
@@ -651,16 +638,6 @@
   }
   .feature-list span {
     color: var(--blue);
-  }
-  .app-preview {
-    padding: 10px;
-    background: var(--soft);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-  }
-  .app-preview img {
-    border-radius: 7px;
-    width: 100%;
   }
   figcaption {
     font-size: 0.75rem;
@@ -922,16 +899,6 @@
     }
     .download-panel {
       grid-row: 1;
-    }
-    .app-heading {
-      gap: 16px;
-    }
-    .detail-icon,
-    .detail-icon.app-icon-fallback {
-      width: 80px;
-    }
-    .app-tagline {
-      font-size: 0.9rem;
     }
     .footer-bottom {
       flex-wrap: wrap;

@@ -3,25 +3,22 @@ import type { App } from '../lib/catalog';
 
 interface Props {
   app: App;
-  detail?: boolean;
 }
 
-const { app, detail = false } = Astro.props;
-const size = detail ? 112 : 80;
-const className = detail ? 'detail-icon' : 'app-icon';
+const { app } = Astro.props;
 ---
 
 {app.iconFallback ? (
-  <span class:list={[className, 'app-icon-fallback']} aria-hidden="true">
+  <span class="app-icon app-icon-fallback" aria-hidden="true">
     {app.iconFallback}
   </span>
 ) : (
   <img
-    class={className}
+    class="app-icon"
     src={`/media/${app.id}-icon.png`}
-    width={size}
-    height={size}
+    width="80"
+    height="80"
     alt=""
-    loading={detail ? undefined : 'lazy'}
+    loading="lazy"
   />
 )}
