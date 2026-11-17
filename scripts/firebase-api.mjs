@@ -100,6 +100,7 @@ export async function stageVersion({
   });
   if (finalized.status !== 'FINALIZED')
     throw new Error('Version was not finalized');
+  await verifyStaged({ api, site, version, commit, config, files });
   return { site, version, commit, labels, fileCount: entries.length };
 }
 export async function verifyStaged({
