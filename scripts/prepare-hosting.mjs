@@ -23,7 +23,23 @@ export async function prepareHosting({ requireSigning = false } = {}) {
   const hashes = {};
   async function copyTree(source, prefix = '') {
     for (const entry of await readdir(source, { withFileTypes: true })) {
-      if (!/^[A-Za-z0-9._-]+$/.test(entry.name) || entry.name.startsWith('.'))
+      // Single narrow exception to the dotfile ban: the RFC 9116 contact
+      // file must live at /.well-known/security.txt. The directory itself
+      // is allowed only at the root, and security.txt is the only file
+      // allowed inside it; every other dotfile is still rejected.
+      const isWellKnownDir =
+        prefix === '' && entry.name === '.well-known' && entry.isDirectory();
+      const isSecurityTxt =
+        prefix === '.well-known/' &&
+        entry.name === 'security.txt' &&
+        entry.isFile();
+      if (
+        !isWellKnownDir &&
+        !isSecurityTxt &&
+        (prefix === '.well-known/' ||
+          !/^[A-Za-z0-9._-]+$/.test(entry.name) ||
+          entry.name.startsWith('.'))
+      )
         throw new Error('Unexpected public file name');
       const relative = prefix + entry.name;
       if (entry.isDirectory())
