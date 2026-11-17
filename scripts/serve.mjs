@@ -32,8 +32,10 @@ createServer(async (req, res) => {
     return;
   }
   if (manifest.revoked.includes(pathname)) {
-    res.writeHead(410);
-    res.end('Download unavailable');
+    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(
+      req.method === 'HEAD' ? undefined : await readFile('dist/404.html'),
+    );
     return;
   }
   if (!manifest.routes[pathname] && manifest.routes[pathname + '/']) {

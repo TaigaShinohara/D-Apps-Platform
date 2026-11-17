@@ -1,4 +1,4 @@
-name: Stage verified content (manual)
+name: Stage verified Firebase version (manual)
 on:
   workflow_dispatch:
 permissions:
@@ -26,22 +26,30 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run check && npm test && npm run build && npm run verify:site
+      - name: Check build resources
+        run: |
+          ps -eo pid,comm
+          df -h .
+          if command -v free >/dev/null; then free -h; else vm_stat; fi
+      - run: npm run check && npm test && npm run verify:distribution && npm run build && npm run verify:site
       - run: npm run verify:release -- --fetch --macos
-      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
+      - run: npm run verify:firebase
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
         with:
-          role-to-assume: ${{ vars.AWS_PUBLISH_ROLE_ARN }}
-          aws-region: ap-northeast-1
-          role-session-name: d-apps-content
-          mask-aws-account-id: true
-      - name: Stage immutable, verified content
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_PUBLISHER_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+      - name: Upload and finalize without a live release
         env:
-          SITE_BUCKET: ${{ vars.SITE_BUCKET }}
-          DOWNLOADS_BUCKET: ${{ vars.DOWNLOADS_BUCKET }}
+          FIREBASE_SITE_ID: ${{ vars.FIREBASE_SITE_ID }}
           RELEASE_ID: ${{ github.sha }}
-        run: node scripts/publish-content.mjs "$SITE_BUCKET" "$DOWNLOADS_BUCKET" "$RELEASE_ID"
+        run: node scripts/firebase-publish.mjs stage "$FIREBASE_SITE_ID" "$RELEASE_ID"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
-          name: matching-edge-configuration
-          path: infra/generated/
+          name: staged-firebase-version
+          path: |
+            infra/generated/
+            .artifacts/hosting/stage-result.json
+          include-hidden-files: true
           retention-days: 7

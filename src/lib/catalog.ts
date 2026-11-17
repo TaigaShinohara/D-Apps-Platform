@@ -134,7 +134,9 @@ export const appSchema = z
   .strict();
 export type App = z.infer<typeof appSchema>;
 export type Distribution = z.infer<typeof distributionSchema>;
-export const apps: App[] = readCatalog().map((value) => appSchema.parse(value));
+export const apps: App[] = readCatalog().map((value: unknown) =>
+  appSchema.parse(value),
+);
 if (new Set(apps.map((app) => app.id)).size !== apps.length)
   throw new Error('Duplicate app identifier.');
 export const categories: Record<App['category'], Record<Locale, string>> = {

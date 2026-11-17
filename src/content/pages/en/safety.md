@@ -17,8 +17,8 @@ We do not ask you to disable system-wide security protections. If installation s
 
 ## If a problem is found
 
-We stop distribution, block access to the affected file, and invalidate cached copies. A fixed release receives a new versioned URL and release notes. See [support](/en/support/) for reporting information.
+We publish a version of the site without the affected links and files, then verify the delivery cache update and that those URLs no longer serve the files. We cannot recall copies already saved on a device. A fixed release receives a new versioned URL and release notes. See [support](/en/support/) for reporting information.
 
 ## Protecting the website
 
-We use HTTPS, restricted origin access, a Content Security Policy, and dependency checks. We operate using aggregate metrics and pre-publication testing rather than storing visitor logs.
+We use HTTPS, a Content Security Policy, and dependency checks. D-Apps operates using aggregate metrics and pre-publication testing. See our [privacy policy](/en/privacy/) for Google’s use and retention of visitors’ IP addresses as the delivery provider.

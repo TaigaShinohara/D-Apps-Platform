@@ -11,9 +11,9 @@ We do not use cookies, localStorage, or identifiers for tracking. Language selec
 
 ## Processing needed to deliver the site
 
-AWS delivers pages and download files. AWS necessarily processes IP addresses and request information to provide network communication and defend against abuse. This does not mean that no information is ever processed on the internet. See the [AWS Privacy Notice](https://aws.amazon.com/privacy/) for AWS’s own practices.
+Google Firebase Hosting delivers pages and download files. Google uses visitors’ IP addresses to detect abuse and analyze usage, and retains IP data for a few months. D-Apps not storing visitor logs does not mean that the delivery provider stores no information. See [Privacy and Security in Firebase](https://firebase.google.com/support/privacy) for details.
 
-D-Apps is configured to disable CloudFront and S3 access logs and WAF request logging and sampling. Monitoring uses aggregate traffic and error metrics. Administrator audit records are separate from visitor tracking.
+D-Apps does not include Google Analytics or Firebase measurement SDKs, or configure additional visitor logging or log exports. Operations use aggregate information such as traffic volumes and costs. Administrator audit records are separate from visitor tracking.
 
 ## External sites and downloaded apps
 
@@ -25,4 +25,4 @@ Downloaded apps have their own data practices, explained on their detail pages. 
 
 Any proposal to collect more data requires a review of this policy and the site design before implementation.
 
-Effective date: November 16, 2026.
+Effective date: November 16, 2026. Updated November 17, 2026 to describe the delivery provider and IP address retention.
