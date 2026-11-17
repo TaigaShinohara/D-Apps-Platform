@@ -16,6 +16,10 @@ export interface ProjectEntry extends ShowcaseEntry {
   detail: Bilingual;
 }
 
+export interface SkillEntry extends ShowcaseEntry {
+  repository: string;
+}
+
 export function projectStatus(project: ProjectEntry, lang: Locale) {
   if (project.status) return project.status[lang];
   if (project.repository)
@@ -242,7 +246,7 @@ export const projects: readonly ProjectEntry[] = [
   },
 ];
 
-export const skills: readonly ShowcaseEntry[] = [
+export const skills: readonly SkillEntry[] = [
   {
     name: 'Concept-driven UX',
     repository: 'concept-driven-ux',

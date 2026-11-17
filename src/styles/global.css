@@ -438,61 +438,6 @@
     margin-block-start: 0.5rem;
     gap: 0.5rem;
   }
-  .showcase-members {
-    margin-block: 0.65rem 0.25rem;
-  }
-  .app-card {
-    container-type: inline-size;
-    padding: 28px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 1rem 1.4rem;
-    align-items: center;
-    transition: border-color 0.15s;
-  }
-  .app-card:hover {
-    border-color: #96afe0;
-  }
-  .app-card > .app-icon {
-    grid-column: 1;
-    grid-row: 1 / 3;
-  }
-  .app-icon-fallback {
-    display: grid;
-    place-items: center;
-    width: 80px;
-    aspect-ratio: 1;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--soft);
-    color: var(--ink);
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
-  .app-card > header {
-    grid-column: 2;
-  }
-  .app-card > div {
-    grid-column: 2;
-  }
-  .app-card > footer {
-    grid-column: 3;
-    grid-row: 1 / 3;
-  }
-  .app-card h3 {
-    font-size: 1.6rem;
-    margin-top: 3px;
-    overflow-wrap: anywhere;
-  }
-  .app-card h3 a {
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .app-card h3 a:hover {
-    text-decoration: underline;
-  }
   .card-summary {
     font-size: 1rem;
   }
@@ -503,18 +448,6 @@
   }
   .card-meta span {
     margin-inline: 0.3rem;
-  }
-  @container (max-width: 550px) {
-    .app-card > .app-icon {
-      grid-row: 1;
-    }
-    .app-card > div {
-      grid-column: 1 / -1;
-    }
-    .app-card > footer {
-      grid-column: 1 / -1;
-      grid-row: auto;
-    }
   }
   .filters {
     display: flex;
@@ -879,9 +812,6 @@
     }
     .section-heading > p {
       margin-top: 3px;
-    }
-    .app-card {
-      padding: 22px;
     }
     .promise {
       grid-template-columns: 1fr;

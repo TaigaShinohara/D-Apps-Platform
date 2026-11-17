@@ -1,0 +1,117 @@
+@layer components {
+  .catalog-card {
+    --card-accent: var(--art-accent, #31536e);
+    --card-padding: clamp(1rem, 2.4vw, 1.45rem);
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    border: 1px solid color-mix(in srgb, var(--card-accent) 22%, var(--line));
+    border-radius: 17px;
+    background: #fff;
+  }
+
+  .catalog-card:is(:hover, :focus-within) {
+    border-color: color-mix(in srgb, var(--card-accent) 50%, var(--line));
+  }
+
+  .catalog-card-heading {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    padding: var(--card-padding);
+    border-radius: 16px 16px 0 0;
+    border-block-end: 1px solid
+      color-mix(in srgb, var(--card-accent) 14%, var(--line));
+    background: linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--card-accent) 23%, white),
+      color-mix(in srgb, var(--card-accent) 6%, white)
+    );
+  }
+
+  .catalog-card h3 {
+    font-size: clamp(1.2rem, 1rem + 0.5vw, 1.45rem);
+    letter-spacing: -0.025em;
+    text-wrap: wrap;
+  }
+
+  .catalog-card h3 a {
+    color: var(--ink);
+    text-decoration-color: var(--muted);
+    text-decoration-thickness: 1px;
+  }
+
+  .catalog-card h3 a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .catalog-icon {
+    display: grid;
+    place-items: center;
+    inline-size: 64px;
+    aspect-ratio: 1;
+    padding: 3px;
+    border: 1px solid rgb(255 255 255 / 85%);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgb(23 37 60 / 15%);
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+
+  .catalog-icon img {
+    inline-size: 100%;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    object-fit: contain;
+  }
+
+  .catalog-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 1rem var(--card-padding);
+  }
+
+  .catalog-card-body .card-meta {
+    margin: 0;
+  }
+
+  .catalog-card-body .text-link {
+    margin-block-start: auto;
+  }
+
+  .catalog-card[data-brand='uroboe'] {
+    --card-accent: #6553b5;
+  }
+  .catalog-card[data-brand='qr-ikki-yomi'] {
+    --card-accent: #087478;
+  }
+  .catalog-card[data-brand='kagecam'] {
+    --card-accent: #465f99;
+  }
+  .catalog-card[data-brand='hyper-capslock'] {
+    --card-accent: #52651e;
+  }
+  .catalog-card[data-brand='concept-driven-ux'] {
+    --card-accent: #355dc1;
+  }
+  .catalog-card[data-brand='mobile-onboarding'] {
+    --card-accent: #337d62;
+  }
+  .catalog-card[data-brand='store-submission-skills'] {
+    --card-accent: #ad5326;
+  }
+  .catalog-card[data-brand='easy-i18n-skill'] {
+    --card-accent: #136e85;
+  }
+  .catalog-card[data-brand='simple-glass-skill'] {
+    --card-accent: #7658a9;
+  }
+  .catalog-card[data-brand='minimal-information-design-skill'] {
+    --card-accent: #ac3f59;
+  }
+}

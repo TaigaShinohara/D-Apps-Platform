@@ -1,24 +1,39 @@
 ---
-import type { App } from '../lib/catalog';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { appArtwork } from '../data/app-artwork';
 
 interface Props {
-  app: App;
+  id: string;
+  name: string;
+  publicIcon?: string;
+  fallback?: string;
 }
 
-const { app } = Astro.props;
+const icons = import.meta.glob<ImageMetadata>('../assets/catalog-icons/*.png', {
+  eager: true,
+  import: 'default',
+});
+const { id, name, publicIcon, fallback } = Astro.props;
+const artwork = appArtwork[id];
+const icon =
+  icons[`../assets/catalog-icons/${id}.png`] ??
+  (artwork?.kind === 'mark' ? artwork.image : undefined);
 ---
 
-{app.iconFallback ? (
-  <span class="app-icon app-icon-fallback" aria-hidden="true">
-    {app.iconFallback}
-  </span>
-) : (
-  <img
-    class="app-icon"
-    src={`/media/${app.id}-icon.png`}
-    width="80"
-    height="80"
-    alt=""
-    loading="lazy"
-  />
-)}
+<span class="catalog-icon" aria-hidden="true">
+  {icon ? (
+    <Image
+      src={icon}
+      width={144}
+      height={144}
+      format="webp"
+      alt=""
+      loading="lazy"
+    />
+  ) : publicIcon ? (
+    <img src={publicIcon} width="64" height="64" alt="" loading="lazy" />
+  ) : (
+    <span>{fallback ?? [...name][0]}</span>
+  )}
+</span>

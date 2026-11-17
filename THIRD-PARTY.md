@@ -48,3 +48,17 @@ Source images live in `src/assets/app-art/`. D-Apps serves optimized copies from
 | mori                    | `assets/mental-states/preview.png` from the local project                                                                                                                           | Publisher artwork, separate from the D-Apps code license |
 | Hoshizora Watch         | Rasterized local project asset `app/src/main/res/drawable/ic_launcher.xml`                                                                                                          | Publisher artwork, separate from the D-Apps code license |
 | Deeple                  | Original Deeple launcher art from `macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png` in the archived app source                                                     | Publisher artwork, separate from the D-Apps code license |
+
+## Home catalog icons
+
+The catalog reuses the app icons listed above. It also uses these publisher assets, optimized for the card size.
+
+| App                  | Material and source                                                                       | Terms                                      |
+| -------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Personal Color Check | Favicon from `index.html` at `414b525`, rendered as PNG                                   | `third-party/personal-color-check-LICENSE` |
+| ImageCrate           | `extension/icons/icon-128.png` at `b0036e8`                                               | `third-party/ImageCrate-LICENSE`           |
+| VideoHarbor          | `extension/icons/icon-128.png` at `1da448d`                                               | `third-party/VideoHarbor-LICENSE`          |
+| Scriptlet            | Adaptive launcher foreground and background color at `591fe04`, rendered as PNG           | `third-party/Scriptlet-LICENSE`            |
+| mori                 | `apple/Mobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` from the local project | Publisher artwork                          |
+
+D-Apps provides catalog pictograms for うろぼえ, Face MBTI, QR一気よみ, KageCam, ハイパーCapsLock, and the skills. The pictograms are covered by the site license.

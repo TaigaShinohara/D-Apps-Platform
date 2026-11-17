@@ -12,19 +12,27 @@ const platforms = [...new Set(app.distributions.map((d) => d.platform))];
 ---
 
 <article
-  class="app-card"
+  class="catalog-card"
+  data-brand={app.id}
   data-app-card
   data-category={app.category}
   data-platforms={platforms.join(',')}
 >
-  <AppIcon app={app} />
-  <header>
-    <p class="eyebrow">{categories[app.category][lang]}</p>
-    <h3>
-      <a href={`/${lang}/apps/${app.id}/`}>{app.name}</a>
-    </h3>
+  <header class="catalog-card-heading">
+    <AppIcon
+      id={app.id}
+      name={app.name}
+      publicIcon={app.iconFallback ? undefined : `/media/${app.id}-icon.png`}
+      fallback={app.iconFallback}
+    />
+    <div>
+      <p class="eyebrow">{categories[app.category][lang]}</p>
+      <h3>
+        <a href={`/${lang}/apps/${app.id}/`}>{app.name}</a>
+      </h3>
+    </div>
   </header>
-  <div>
+  <div class="catalog-card-body">
     <p class="card-summary">{app.summary[lang]}</p>
     <p class="card-meta">
       {platforms.join(' / ')}
@@ -37,12 +45,10 @@ const platforms = [...new Set(app.distributions.map((d) => d.platform))];
         ),
       ].join(' / ')}
     </p>
-  </div>
-  <footer>
     <a class="text-link" href={`/${lang}/apps/${app.id}/`}>
       {lang === 'ja' ? '詳しく見る' : 'Explore'}
       <span class="sr-only"> {app.name}</span>
       <span aria-hidden="true">↗</span>
     </a>
-  </footer>
+  </div>
 </article>

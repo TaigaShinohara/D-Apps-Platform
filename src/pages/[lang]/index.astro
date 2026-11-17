@@ -5,6 +5,8 @@ import ShowcaseSection from '../../components/ShowcaseSection.astro';
 import { projects, skills } from '../../data/showcase';
 import { apps, locales, categories, type Locale } from '../../lib/catalog';
 import { scriptIntegrity } from '../../lib/security.mjs';
+import '../../styles/app-artwork.css';
+import '../../styles/catalog-cards.css';
 export function getStaticPaths() {
   return locales.map((lang) => ({ params: { lang } }));
 }
