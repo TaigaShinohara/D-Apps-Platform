@@ -1,7 +1,10 @@
 import { readdir, mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { hostingConfig, servingConfig } from './firebase-config.mjs';
-import { readCatalog, readRevocations } from '../src/lib/catalog-data.mjs';
+import {
+  readDirectDownloads,
+  readRevocations,
+} from '../src/lib/catalog-data.mjs';
 const routes = {};
 async function walk(directory, prefix = '') {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -16,17 +19,7 @@ async function walk(directory, prefix = '') {
   }
 }
 await walk('dist');
-const downloads = readCatalog().flatMap((app) =>
-  app.distributions
-    .filter((item) => item.kind === 'direct')
-    .map((item) => {
-      if (app.id !== 'oneclip' || item.filename !== 'OneClip-1.0.1.zip')
-        throw new Error(
-          'Add and verify a release policy before enabling a new direct download.',
-        );
-      return `/downloads/${app.id}/${item.version}/${item.filename}`;
-    }),
-);
+const downloads = readDirectDownloads().map(({ path }) => path);
 const revoked = readRevocations();
 await rm('infra/generated', { recursive: true, force: true });
 await mkdir('infra/generated', { recursive: true });

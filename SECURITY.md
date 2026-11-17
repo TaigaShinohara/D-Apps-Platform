@@ -9,7 +9,7 @@ The supported site version is the current `main` branch. App vulnerabilities bel
 ## Maintainer response
 
 1. Verify the report with synthetic data, preserving relevant management audit evidence without enabling visitor request logging.
-2. For a distribution issue, add the exact URL to `config/revoked-downloads.json`, remove the active download link, deploy the matching request function, and invalidate the file's CloudFront cache. A file that has already been downloaded cannot be recalled.
-3. Confirm 410 from the edge and verify that direct S3 access remains denied. Disable the distribution for a broader incident if needed.
+2. For a distribution issue, add the exact download path to `config/revoked-downloads.json` and retain its immutable record in `config/distribution-lock.json`. Build, stage, and publish the new Firebase Hosting version using the approved release workflow. The revoked file and its links are excluded, even if the original ZIP is unavailable.
+3. Confirm the download link is gone and the path returns HTTP 404 for GET, HEAD, and Range on the canonical and both Firebase hostnames. Verify the `www` redirect preserves the path. A file that has already been downloaded cannot be recalled. Follow the recovery runbook for a broader incident.
 4. Publish a corrected release under a new versioned URL. Never replace an existing release in place.
 5. Document scope, verification, remaining limitations, and the recovery action. See [the deployment runbook](docs/DEPLOYMENT.md).

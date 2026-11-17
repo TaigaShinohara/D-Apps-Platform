@@ -8,7 +8,7 @@ import {
 } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { readCatalog } from '../src/lib/catalog-data.mjs';
+import { readDirectDownloads } from '../src/lib/catalog-data.mjs';
 
 export const sha256 = (bytes) =>
   createHash('sha256').update(bytes).digest('hex');
@@ -42,39 +42,34 @@ export async function prepareHosting({ requireSigning = false } = {}) {
   const lock = JSON.parse(
     await readFile('config/distribution-lock.json', 'utf8'),
   );
-  for (const app of readCatalog())
-    for (const item of app.distributions.filter((d) => d.kind === 'direct')) {
-      const path = `/downloads/${app.id}/${item.version}/${item.filename}`;
-      if (manifest.revoked.includes(path)) continue;
+  for (const { item, path } of readDirectDownloads()) {
+    if (manifest.revoked.includes(path)) continue;
+    if (lock[path]?.sha256 !== item.sha256 || lock[path]?.bytes !== item.bytes)
+      throw new Error('An immutable download record is required');
+    const bytes = await readFile(`.artifacts/releases/${item.filename}`);
+    if (bytes.length !== item.bytes || sha256(bytes) !== item.sha256)
+      throw new Error('Download integrity check failed');
+    if (requireSigning) {
+      const check = JSON.parse(
+        await readFile('.artifacts/releases/verification.json', 'utf8'),
+      );
+      const age = Date.now() - Date.parse(check.checkedAt);
       if (
-        lock[path]?.sha256 !== item.sha256 ||
-        lock[path]?.bytes !== item.bytes
+        check.signing !== 'passed' ||
+        check.sha256 !== item.sha256 ||
+        check.version !== item.version ||
+        !Number.isFinite(age) ||
+        age < 0 ||
+        age > 24 * 60 * 60 * 1000
       )
-        throw new Error('An immutable download record is required');
-      const bytes = await readFile(`.artifacts/releases/${item.filename}`);
-      if (bytes.length !== item.bytes || sha256(bytes) !== item.sha256)
-        throw new Error('Download integrity check failed');
-      if (requireSigning) {
-        const check = JSON.parse(
-          await readFile('.artifacts/releases/verification.json', 'utf8'),
-        );
-        const age = Date.now() - Date.parse(check.checkedAt);
-        if (
-          check.signing !== 'passed' ||
-          check.sha256 !== item.sha256 ||
-          check.version !== item.version ||
-          !Number.isFinite(age) ||
-          age < 0 ||
-          age > 24 * 60 * 60 * 1000
-        )
-          throw new Error('Fresh macOS signing verification required');
-      }
-      await mkdir(join(output, path.slice(1, path.lastIndexOf('/'))), {
-        recursive: true,
-      });
-      await writeFile(join(output, path.slice(1)), bytes);
-      hashes[path] = item.sha256;
+        throw new Error('Fresh macOS signing verification required');
     }
+    await mkdir(join(output, path.slice(1, path.lastIndexOf('/'))), {
+      recursive: true,
+    });
+    await writeFile(join(output, path.slice(1)), bytes);
+    hashes[path] = item.sha256;
+  }
   for (const path of manifest.revoked)
     if (hashes[path])
       throw new Error('Revoked binary included in hosting bundle');

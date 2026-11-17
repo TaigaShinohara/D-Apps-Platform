@@ -14,9 +14,10 @@ import { join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { sha256 } from '../scripts/prepare-hosting.mjs';
 
-test('bundle refuses tampered/unsigned files and excludes revoked files from a fresh tree', async () => {
+test('bundle refuses tampered/unsigned files and revocation works without the upstream ZIP', async () => {
   const root = await mkdtemp(join(tmpdir(), 'd-apps-bundle-'));
   const script = resolve('scripts/prepare-hosting.mjs');
+  const verifier = resolve('scripts/verify-release.mjs');
   const path = '/downloads/oneclip/1.0.1/OneClip-1.0.1.zip';
   const bytes = Buffer.from('synthetic binary, never distributed');
   const item = {
@@ -76,6 +77,20 @@ test('bundle refuses tampered/unsigned files and excludes revoked files from a f
     await writeFile(
       join(root, 'infra/generated/manifest.json'),
       JSON.stringify({ revoked: [path] }),
+    );
+    await rm(zip);
+    const unavailableUpstream =
+      'data:text/javascript,' +
+      encodeURIComponent(
+        'globalThis.fetch = async () => { throw new Error("Upstream ZIP unavailable"); };',
+      );
+    execFileSync(
+      process.execPath,
+      ['--import', unavailableUpstream, verifier, '--fetch', '--macos'],
+      { cwd: root, stdio: 'pipe' },
+    );
+    await assert.rejects(
+      access(join(root, '.artifacts/releases/verification.json')),
     );
     run(true);
     await assert.rejects(access(join(root, '.artifacts/hosting/public', path)));

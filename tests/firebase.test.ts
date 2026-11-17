@@ -216,6 +216,91 @@ test('publication verifies files and reads back the released version', async () 
   assert.equal(fake.published(), true);
   assert.equal(result.version, version);
 });
+test('publication saves its receipt before retrying delayed read-back without another POST', async () => {
+  const fake = fakeRelease();
+  const records: Array<{ status: string; release?: string }> = [];
+  let posts = 0;
+  let readbacks = 0;
+  const result = await releaseVersion({
+    api: async (method: string, path: string) => {
+      if (method === 'POST') posts++;
+      if (method === 'GET' && path.includes('/releases?') && fake.published()) {
+        assert.equal(records.at(-1)?.status, 'accepted');
+        assert.equal(records.at(-1)?.release, `sites/${site}/releases/r1`);
+        readbacks++;
+        if (readbacks === 1) throw new Error('HTTP 503');
+        if (readbacks === 2) return { releases: [] };
+      }
+      return fake.api(method, path);
+    },
+    site,
+    version,
+    commit,
+    config,
+    files,
+    expectedCurrent: 'NONE',
+    recordRelease: async (record: (typeof records)[number]) => {
+      records.push(record);
+    },
+    wait: async () => {},
+  });
+  assert.equal(posts, 1);
+  assert.equal(readbacks, 3);
+  assert.deepEqual(
+    records.map((record) => record.status),
+    ['submission-unconfirmed', 'accepted', 'confirmed'],
+  );
+  assert.equal(result.release, `sites/${site}/releases/r1`);
+});
+test('publication retains the last known state when the response or read-back is unavailable', async () => {
+  for (const failedMethod of ['POST', 'GET']) {
+    const fake = fakeRelease();
+    const records: Array<{ status: string; release?: string }> = [];
+    let posts = 0;
+    let readbacks = 0;
+    await assert.rejects(
+      releaseVersion({
+        api: async (method: string, path: string) => {
+          const result = await fake.api(method, path);
+          if (method === 'POST') {
+            posts++;
+            if (failedMethod === method) throw new Error('Request timed out');
+          }
+          if (
+            method === 'GET' &&
+            path.includes('/releases?') &&
+            fake.published()
+          ) {
+            readbacks++;
+            throw new Error('HTTP 503');
+          }
+          return result;
+        },
+        site,
+        version,
+        commit,
+        config,
+        files,
+        expectedCurrent: 'NONE',
+        recordRelease: async (record: (typeof records)[number]) => {
+          records.push(record);
+        },
+        wait: async () => {},
+      }),
+      /inspect .*before retrying/,
+    );
+    assert.equal(posts, 1);
+    assert.equal(readbacks, failedMethod === 'POST' ? 0 : 3);
+    assert.equal(
+      records.at(-1)?.status,
+      failedMethod === 'POST' ? 'submission-unconfirmed' : 'accepted',
+    );
+    assert.equal(
+      records.at(-1)?.release,
+      failedMethod === 'POST' ? undefined : `sites/${site}/releases/r1`,
+    );
+  }
+});
 test('verification records only the two known Firebase-managed routes across pages', async () => {
   const managed = ['/__/firebase/init.js', '/__/firebase/init.json'].map(
     (path) => ({

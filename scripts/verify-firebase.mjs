@@ -70,6 +70,14 @@ try {
     '/downloads/unapproved/1.0.0/file.zip',
   ])
     assert.equal((await get(path)).status, 404, path);
+  for (const path of manifest.revoked) {
+    assert.equal((await get(path, { method: 'HEAD' })).status, 404, path);
+    assert.equal(
+      (await get(path, { headers: { Range: 'bytes=0-15' } })).status,
+      404,
+      path,
+    );
+  }
   const originalPage = await (await get('/ja/')).text();
   const methodStatuses = {};
   for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {

@@ -1,29 +1,20 @@
 # dobulab.com の公開・DNS接続確認資料
 
-2026-11-17。正規URLは `https://dobulab.com`、`www.dobulab.com` は正規URLへの301転送として接続します。配信先は既存の Firebase Hosting サイト `d-apps-deepledeeple` です。登録とDNSの管理は Route 53 を使います。旧 `deepledeeple.com` 向けの変更案は適用対象から外しています。
+2026-11-17に `https://dobulab.com` を正規URLとして公開しました。`www.dobulab.com` はパスを維持して正規URLに301転送します。配信先は Firebase Hosting の `d-apps-deepledeeple`、DNSの管理は Route 53 です。
 
-## 読み取りで確認した現状
+## 初回接続の確認結果
 
-2026-11-17に公開DNSを照会し、Route 53 の委任を確認しました。切替前の状態を把握するための照会で、ゾーン全体の設定は対象アカウントで確認します。
+正規URL・両Firebase標準ホストのHTTPS、`www` の301転送、OneClip ZIPのハッシュと部分取得を確認しました。既存メールのDNS設定は維持しました。切替時のDNS差分と復旧用の情報は非公開の運用記録に保存しています。
 
-| 名前              | 種別                      | 公開応答                                                                                           | 接続時の扱い     |
-| ----------------- | ------------------------- | -------------------------------------------------------------------------------------------------- | ---------------- |
-| `dobulab.com`     | NS                        | `ns-1403.awsdns-47.org`, `ns-1564.awsdns-03.co.uk`, `ns-351.awsdns-43.com`, `ns-873.awsdns-45.net` | 維持             |
-| `dobulab.com`     | A / AAAA / MX / TXT / CAA | 該当レコードの回答なし                                                                             | 実行直前に再確認 |
-| `www.dobulab.com` | A / CNAME                 | NXDOMAIN                                                                                           | 実行直前に再確認 |
+## ドメインを再接続する場合
 
-Firebaseで `dobulab.com` と `www.dobulab.com` の登録と転送先を読み戻しました。所有権・証明書は検証待ちです。DNS要求値と証明書の検証値は非公開の作業記録に保存しています。適用前にFirebaseの最新値と対象ゾーンの現状を照合します。
-
-## 公開承認後に確定・実行する差分
-
-1. 公開する main コミット、成功したCI、非公開ステージの版名・bundle digestを照合する。OneClipの基本動作と、人による残りの利用確認を完了する。初回は現在の live が `NONE` であることを再確認する。
+1. 現在の Hosting の live 版とドメイン設定を確認する。コンテンツも変更する場合は[公開手順](DEPLOYMENT.md#reviewed-release-sequence)に従う。
 2. Route 53 の既存ゾーンから、対象名の全レコード・TTL・Alias・ルーティングポリシーを非公開ファイルに退避する。公開DNSだけで「他のレコードがない」と判断しない。AWS rootによる常用運用は行わず、対象ゾーンに限定した運用者の接続で実施する。
 3. Firebase で `dobulab.com` と `www.dobulab.com` の登録、`www` の転送先が `dobulab.com` であることを確認する。[公式の接続手順](https://firebase.google.com/docs/hosting/custom-domain)と `requiredDnsUpdates` を照合し、サービスが返した値で Route 53 の変更案を確定する。
 4. 所有権確認用のTXTは独立した値として追加する。同名のTXTが既にある場合は全値を引き継ぐ。証明書用のTXT/CAAが必要なら、その名前と値も差分に含める。DKIM・DMARC・MX・NS・SOAや他のサブドメインは維持する。
-5. 承認された Hosting release を公開する。この時点で `d-apps-deepledeeple.web.app` と `d-apps-deepledeeple.firebaseapp.com` に一般公開される。標準ホストでもHTTPS・日英ページ・404・ダウンロードのハッシュを検証する。
-6. 承認されたDNS差分を適用し、権威DNS・公開DNS・Firebaseのドメイン/証明書状態を確認する。HTTPS接続と既存サービスへの影響も確認する。
+5. 承認されたDNS差分を適用し、権威DNS・公開DNS・Firebaseのドメインと証明書の状態を確認する。HTTPS接続と既存サービスへの影響も確認する。
 
-DNSの最終差分はFirebaseから取得した名前・種別・値と、Route 53の対象ゾーンを照合して確定します。本番公開とDNS適用は実行承認後に進めます。
+DNSの差分はFirebaseから取得した名前・種別・値と、Route 53の対象ゾーンを照合して確定します。DNS変更は実行承認後に進めます。
 
 ## 公開直後の確認
 

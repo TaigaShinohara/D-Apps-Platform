@@ -2,8 +2,14 @@ import { readFile, mkdir, writeFile, rename, stat, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
-const app = JSON.parse(await readFile('src/data/oneclip.json', 'utf8'));
-const item = app.distributions[0];
+import { readDirectDownloads } from '../src/lib/catalog-data.mjs';
+
+const [download] = readDirectDownloads();
+if (!download) {
+  console.log('No active direct downloads to verify.');
+  process.exit(0);
+}
+const { app, item } = download;
 const directory = '.artifacts/releases';
 const target = join(directory, item.filename);
 await mkdir(directory, { recursive: true });
@@ -54,7 +60,7 @@ const hash = createHash('sha256').update(data).digest('hex');
 if ((await stat(target)).size !== item.bytes || hash !== item.sha256)
   throw new Error('Release integrity mismatch');
 const report = {
-  app: app.id,
+  app,
   version: item.version,
   bytes: item.bytes,
   sha256: hash,
