@@ -98,11 +98,11 @@ test('CI lookup stays on the GitHub API and fails closed', async () => {
       token: 'test-token',
       repository: 'TaigaShinohara/D-Apps-Platform',
       sha,
-      fetchImpl: (async () => ({
+      fetchImpl: (async (_url: URL) => ({
         ok: false,
         status: 403,
         json: async () => ({ message: 'hidden' }),
-      })) as typeof fetch,
+      })) as unknown as typeof fetch,
     }),
     (error: unknown) => {
       assert.ok(error instanceof Error);
