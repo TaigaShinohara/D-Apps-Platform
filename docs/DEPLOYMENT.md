@@ -1,12 +1,12 @@
 # Firebase Hosting deployment and recovery
 
-**Dedicated Google resources, billing link and WIF were configured after owner approval on 2026-11-17. No Hosting release or DNS change has been executed.** On 2026-11-17 the owner selected Firebase Hosting and accepted Google's retention of visitor IP data for a few months. Review the exact project, costs and DNS changes before execution approval. Git merges do not publish the site.
+The dedicated Google project, billing link and WIF were configured after owner approval. The site went live on [dobulab.com](https://dobulab.com/ja/) and the two Firebase hostnames on 2026-11-17. See the [DNS cutover record](DOMAIN-CUTOVER.md). Git merges do not publish site updates.
 
 ## Architecture and privacy
 
 Astro builds static pages/assets; Firebase Hosting delivers them and the original approved ZIPs through its CDN/TLS. No Firebase SDK, Analytics, database, Auth, Functions, Cloud Run backend or web app registration is required. The former AWS stacks, IAM proposal and publishing scripts are retired. No AWS resources were created during setup. Route 53 remains the existing domain/DNS manager.
 
-The operator collects no forms, accounts, uploads, tracking identifiers or visitor logs, and enables no additional analytics or request-log exports. Google's own Hosting service retains incoming IP data for a few months for abuse detection and usage analysis. This is an accepted, disclosed exception to the original provider-wide no-retention requirement. See [Firebase privacy](https://firebase.google.com/support/privacy). Review existing organization integrations/log exports before launch without disabling unrelated administrator auditing. Use aggregate traffic/storage/cost metrics.
+The operator collects no forms, accounts, uploads, tracking identifiers or visitor logs, and enables no additional analytics or request-log exports. Google's Hosting service retains incoming IP data for a few months for abuse detection and usage analysis. See [Firebase privacy](https://firebase.google.com/support/privacy). Review organization integrations and log exports after configuration changes, and use aggregate traffic, storage and cost metrics.
 
 ## Reviewable configuration
 
@@ -39,18 +39,18 @@ After reviewing Terraform outputs, set these non-secret production environment v
 
 ## Reviewed release sequence
 
-Initial project/billing/WIF setup below is already complete; do not repeat provisioning on each release. For the initial domain connection, use [the DNS review and cutover record](DOMAIN-CUTOVER.md), preserving the existing mail records.
+1. Check CI for the reviewed main commit. It covers lint, types, unit tests, build, static checks, distribution history, browsers, dependencies and secret scanning. Smoke-test a new app binary when it is part of the release.
+2. Run **Stage verified Firebase version (manual)** from the reviewed commit. It downloads and verifies the size, SHA-256, archive boundaries, signature, notarization and Gatekeeper assessment of each active direct download on macOS. Staging finalizes a version and compares its file hashes, configuration and labels with the build. Record the version, commit and bundle digest.
+3. Read the current live version. After publication approval, run **Publish reviewed Firebase version (manual)** from the same commit with the staged version and the expected live version. Use `NONE` for a site with no live version. If main changed, stage again. The workflow rebuilds and verifies the staged files, configuration and labels before changing the live version.
+4. Verify the result on the canonical and both default Firebase hostnames. Check language navigation, normal and error responses, and the hash of each active ZIP. Confirm the `www` redirect preserves the path. Record the confirmed release, checks and any open issues.
 
-1. Complete [release readiness](RELEASE-READINESS.md), including account/credit checks and OneClip smoke testing. Run lint, type checks, unit tests, build, static checks, distribution-lock history checks, browser tests and dependency/secret scans on the reviewed commit.
-2. After execution approval, prepare the dedicated project and billing choice. Review a private Terraform plan for that exact project, importing existing Firebase/site resources as needed. Apply only the reviewed plan; do not enable Analytics in the console.
-3. Set up the protected GitHub environment. Run **Stage verified Firebase version (manual)** from the reviewed main commit. It verifies original ZIP size, SHA-256, archive boundaries, signing identity/team, notarization and Gatekeeper on macOS before obtaining Google credentials.
-4. Staging copies only built static files and approved original ZIPs, hashes compressed bytes for the Hosting API, uploads to the exact Google endpoint and finalizes a version. It then reads back configuration, commit/bundle labels and the complete file/hash inventory before reporting success. It creates **no live release or public preview channel**. Record the version name, commit and bundle digest from its report.
-5. Inspect the current live version, or confirm `NONE` for initial publication. After publication approval, run **Publish reviewed Firebase version (manual)** from the same main commit, with the finalized version and expected current live version. If main changed, stage again. Rebuilding and fresh ZIP verification precede comparing every remote file/hash, config and commit label. The script checks current live state, creates the release and reads it back.
-6. A release is public on `<site>.web.app` and `<site>.firebaseapp.com` immediately, before custom-domain DNS changes. These default hosts remain reachable; do not claim apex-only access. Publication approval is required even when the custom domain is not connected.
-7. Connect `dobulab.com` in Firebase Hosting and add `www.dobulab.com` as a redirect to the apex. Follow the [domain cutover review](DOMAIN-CUTOVER.md) for the exact records returned for these names. Keep Route 53 as the DNS provider and preserve unrelated records. Record the previous apex/www values and TTLs before approving the DNS changes.
-8. Wait for domain/certificate status to become connected. Verify HTTP-to-HTTPS and www redirects, root/language navigation, normal/error headers, actual ZIP SHA-256, 404, cookies/subresources and non-GET/HEAD behavior on every live hostname. Inspect actual project integrations/log exports and billing/credit dashboards. Save observed versions, measurements and DNS rollback data in the private task record.
+Both workflows share a concurrency group. The current-version check cannot prevent a Firebase Console release between the check and the publication request. Use a single publisher.
 
-Both manual workflows share one concurrency group. Hosting has no atomic compare-and-swap release precondition: the current-version check detects prior changes but cannot prevent a console release between calls. Use a single publisher and no concurrent out-of-band releases. If release/read-back fails, inspect current state before retrying.
+If publication fails, read the `firebase-release-result` artifact or the workflow log and compare the requested version with the live release in Firebase Console before rerunning:
+
+- `submission-unconfirmed` records the intended version and expected previous version before the publication request. Check the live release history to see whether Firebase applied it.
+- `accepted` includes Firebase's release ID. The workflow makes up to three attempts to confirm the live version by reading only. If it fails, check which version is live and record the result.
+- `confirmed` means the workflow observed the requested live version. Complete the public HTTP checks in step 4.
 
 ## Headers, caching and platform limits
 
@@ -62,7 +62,7 @@ Local verification uses Firebase's official static engine, `superstatic`, with t
 
 For a new version, append its URL/hash/size to the distribution lock and update release validation for that formal artifact. CI rejects changes/removal of existing lock entries and removal of prior revocations relative to the base commit. Hosting has no former S3 conditional-write policy: repository review and byte checks enforce URL immutability.
 
-For an incident, append the affected URL to the revocation list and rebuild/stage/release. Catalog links are filtered, an app with no remaining distributions is hidden from the catalog while its detail/support page remains with a stopped-distribution notice, and the binary is excluded. Static inspection rejects lingering links. New releases invalidate the Hosting CDN; verify **404**, including GET/HEAD/range requests on apex/www and both default hosts. Do not promise 410 or recall of already downloaded files. No public preview channels should retain release binaries. See [Hosting cache behavior](https://firebase.google.com/docs/hosting/manage-cache).
+For an incident, append the affected path to the revocation list and rebuild, stage and publish. A revoked ZIP is excluded from the links, verification and bundle, so an unavailable upstream ZIP does not block publication. An app with no remaining downloads keeps its detail and support pages with a stopped-distribution notice. New releases invalidate the Hosting CDN. Verify **404** for GET, HEAD and Range requests on the canonical and both Firebase hostnames, and follow the `www` redirect to verify the same result. Files already downloaded cannot be recalled. See [Hosting cache behavior](https://firebase.google.com/docs/hosting/manage-cache).
 
 For rollback, restore prior site content in a new reviewed commit while **retaining current revocations and the complete distribution lock**, then stage/release normally. A direct console rollback can resurrect stopped binaries and must not be used. Missing/mismatched files fail closed. Urgent hosting-disable actions require explicit owner approval and verification on every hostname. No destructive cleanup is automated.
 

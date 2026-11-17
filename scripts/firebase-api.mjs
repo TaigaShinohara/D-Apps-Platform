@@ -1,4 +1,5 @@
 import { gzipSync } from 'node:zlib';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { sha256 } from './prepare-hosting.mjs';
 
 export const apiOrigin = 'https://firebasehosting.googleapis.com/v1beta1/';
@@ -180,25 +181,79 @@ export async function verifyStaged({
     throw new Error('Remote file hashes differ or include unexpected files');
   return { managedFiles };
 }
-export async function releaseVersion(options) {
+/**
+ * @param {{
+ *   api: (method: string, path: string, data?: { message: string }) => Promise<any>,
+ *   site: string, commit: string, version: string, expectedCurrent: string,
+ *   config: object, files: Record<string, Buffer>,
+ *   recordRelease?: (record: {
+ *     site: string, commit: string, version: string, expectedCurrent: string,
+ *     status: 'submission-unconfirmed' | 'accepted' | 'confirmed', release?: string
+ *   }) => Promise<void>,
+ *   wait?: (milliseconds: number) => Promise<void>
+ * }} options
+ */
+export async function releaseVersion({
+  recordRelease = async () => {},
+  wait = sleep,
+  ...options
+}) {
   // This is the only live publication call; staging never invokes it.
   await verifyStaged(options);
-  const { api, site, version, expectedCurrent } = options;
+  const { api, site, commit, version, expectedCurrent } = options;
   if (expectedCurrent !== 'NONE') validateVersion(site, expectedCurrent);
-  const current = await api('GET', `sites/${site}/releases?pageSize=1`);
-  if ((current.releases?.[0]?.version?.name || 'NONE') !== expectedCurrent)
+  const liveVersion = async () => {
+    const current = await api('GET', `sites/${site}/releases?pageSize=1`);
+    return current.releases?.[0]?.version?.name || 'NONE';
+  };
+  if ((await liveVersion()) !== expectedCurrent)
     throw new Error('Live version changed; review again before publishing');
-  const released = await api(
-    'POST',
-    `sites/${site}/releases?versionName=${encodeURIComponent(version)}`,
-    { message: `Reviewed commit ${options.commit}` },
-  );
-  if (released.version?.name !== version)
-    throw new Error('Release response did not confirm the requested version');
-  const confirmed = await api('GET', `sites/${site}/releases?pageSize=1`);
-  if (confirmed.releases?.[0]?.version?.name !== version)
-    throw new Error(
-      'Live release read-back did not match; inspect Hosting before retrying',
+  const attempt = { site, commit, version, expectedCurrent };
+  await recordRelease({ ...attempt, status: 'submission-unconfirmed' });
+  let released;
+  try {
+    released = await api(
+      'POST',
+      `sites/${site}/releases?versionName=${encodeURIComponent(version)}`,
+      { message: `Reviewed commit ${commit}` },
     );
-  return { version, release: released.name };
+  } catch (error) {
+    throw new Error(
+      'Publication response unavailable; inspect the live release before retrying',
+      { cause: error },
+    );
+  }
+  if (released?.version?.name !== version || !released.name)
+    throw new Error(
+      'Publication response did not confirm the request; inspect the live release before retrying',
+    );
+  const accepted = { ...attempt, release: released.name };
+  await recordRelease({ ...accepted, status: 'accepted' });
+
+  // A delayed or failed read must never send another publication request.
+  let readError;
+  for (const delay of [0, 1_000, 2_000]) {
+    if (delay) await wait(delay);
+    let current;
+    try {
+      current = await liveVersion();
+      readError = undefined;
+    } catch (error) {
+      readError = error;
+      continue;
+    }
+    if (current === version) {
+      const result = {
+        ...accepted,
+        status: /** @type {const} */ ('confirmed'),
+      };
+      await recordRelease(result);
+      return result;
+    }
+    if (current !== expectedCurrent) break;
+  }
+  throw new Error(
+    'Firebase accepted the release but the live version could not be confirmed; inspect Hosting before retrying',
+    { cause: readError },
+  );
 }

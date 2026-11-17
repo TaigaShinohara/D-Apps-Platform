@@ -57,8 +57,10 @@ jobs:
           EXPECTED_CURRENT: ${{ inputs.expected_current }}
         run: node scripts/firebase-publish.mjs release "$FIREBASE_SITE_ID" "$RELEASE_ID" "$REVIEWED_VERSION" "$EXPECTED_CURRENT"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: ${{ !cancelled() }}
         with:
           name: firebase-release-result
           path: .artifacts/hosting/release-result.json
+          if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 7

@@ -2,10 +2,13 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { apps, appDetails } from '../../src/lib/catalog';
-import { readRevocations } from '../../src/lib/catalog-data.mjs';
+import { appDetails } from '../../src/lib/catalog';
+import {
+  readDirectDownloads,
+  readRevocations,
+} from '../../src/lib/catalog-data.mjs';
 import { scriptIntegrity, securityHeaders } from '../../src/lib/security.mjs';
-const oneclipAvailable = apps.some((app) => app.id === 'oneclip');
+const oneclipAvailable = readDirectDownloads().length > 0;
 const canonicalOrigin = 'https://dobulab.com';
 
 for (const lang of ['ja', 'en']) {
@@ -238,6 +241,9 @@ test('revoked URLs cannot be downloaded or linked from public app pages', async 
   for (const path of revoked) {
     expect((await request.get(path)).status()).toBe(404);
     expect((await request.head(path)).status()).toBe(404);
+    expect(
+      (await request.get(path, { headers: { Range: 'bytes=0-15' } })).status(),
+    ).toBe(404);
   }
   for (const lang of ['ja', 'en'])
     for (const path of [
@@ -252,6 +258,7 @@ test('revoked URLs cannot be downloaded or linked from public app pages', async 
     }
 });
 test('direct release bytes available for deterministic download test', async () => {
+  test.skip(!oneclipAvailable, 'OneClip distribution is currently stopped');
   expect((await readFile('.artifacts/releases/OneClip-1.0.1.zip')).length).toBe(
     3821021,
   );

@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, rename, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import { GoogleAuth } from 'google-auth-library';
 import { prepareHosting } from './prepare-hosting.mjs';
@@ -66,6 +66,7 @@ async function request(method, url, data) {
         },
         maxRedirects: 0,
         timeout: 60_000,
+        ...(mode === 'release' && method === 'POST' ? { retry: false } : {}),
       })
     ).data;
   } catch (error) {
@@ -78,20 +79,24 @@ async function request(method, url, data) {
 }
 const api = (method, path, data) => request(method, apiOrigin + path, data);
 const upload = (url, data) => request('POST', url, data);
-const result =
-  mode === 'stage'
-    ? await stageVersion({ api, upload, site, commit, config, files })
-    : await releaseVersion({
-        api,
-        site,
-        commit,
-        config,
-        files,
-        version,
-        expectedCurrent,
-      });
-await writeFile(
-  `.artifacts/hosting/${mode}-result.json`,
-  JSON.stringify(result, null, 2) + '\n',
-);
-console.log(JSON.stringify({ operation: mode, ...result }));
+async function recordResult(result) {
+  const path = `.artifacts/hosting/${mode}-result.json`;
+  console.log(JSON.stringify({ operation: mode, ...result }));
+  await writeFile(path + '.tmp', JSON.stringify(result, null, 2) + '\n');
+  await rename(path + '.tmp', path);
+}
+if (mode === 'stage')
+  await recordResult(
+    await stageVersion({ api, upload, site, commit, config, files }),
+  );
+else
+  await releaseVersion({
+    api,
+    site,
+    commit,
+    config,
+    files,
+    version,
+    expectedCurrent,
+    recordRelease: recordResult,
+  });
