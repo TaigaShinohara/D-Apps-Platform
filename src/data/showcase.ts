@@ -188,4 +188,12 @@ export const skills: readonly ShowcaseEntry[] = [
       en: 'Design and implement translucent glass effects across app and web platforms.',
     },
   },
+  {
+    name: 'Minimal Information Design',
+    repository: 'minimal-information-design-skill',
+    summary: {
+      ja: 'アプリの情報量を減らし、文字に頼らずアイコン・図形・操作UIで伝える。分割・折りたたみ・段階表示で、読まなくても直感的に使える設計にするスキル。',
+      en: 'A skill to reduce app information load — less text, more icons, shapes and UI, with paging, folding and progressive disclosure so apps feel intuitive without reading.',
+    },
+  },
 ];
