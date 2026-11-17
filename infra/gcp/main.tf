@@ -101,7 +101,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
     "assertion.repository_owner_id == '178877625'",
     "assertion.repository_id == '1459714940'",
     "assertion.ref == 'refs/heads/main'",
-    "assertion.sub == 'repo:TaigaShinohara/D-Apps-Platform:environment:production'",
+    "assertion.sub == 'repo:TaigaShinohara@178877625/D-Apps-Platform@1459714940:environment:production'",
     "assertion.workflow_ref in ['TaigaShinohara/D-Apps-Platform/.github/workflows/stage-content.yml@refs/heads/main', 'TaigaShinohara/D-Apps-Platform/.github/workflows/release-hosting.yml@refs/heads/main']",
   ])
   oidc { issuer_uri = "https://token.actions.githubusercontent.com" }

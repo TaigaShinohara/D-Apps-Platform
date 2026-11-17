@@ -4,6 +4,7 @@ import { gunzipSync } from 'node:zlib';
 import {
   encodeFiles,
   stageVersion,
+  verifyStaged,
   releaseVersion,
   releaseLabels,
   validateUploadURL,
@@ -214,6 +215,61 @@ test('publication verifies files and reads back the released version', async () 
   });
   assert.equal(fake.published(), true);
   assert.equal(result.version, version);
+});
+test('verification records only the two known Firebase-managed routes across pages', async () => {
+  const managed = ['/__/firebase/init.js', '/__/firebase/init.json'].map(
+    (path) => ({
+      path,
+      hash: 'b'.repeat(64),
+      status: 'ACTIVE',
+    }),
+  );
+  const result = await verifyStaged({
+    api: async (_method: string, path: string) => {
+      if (path === version) return remote;
+      if (path.includes('pageToken=next')) return { files: managed };
+      return {
+        files: Object.entries(hashes).map(([path, hash]) => ({ path, hash })),
+        nextPageToken: 'next',
+      };
+    },
+    site,
+    version,
+    commit,
+    config,
+    files,
+  });
+  assert.deepEqual(
+    result.managedFiles,
+    Object.fromEntries(managed.map((f) => [f.path, f.hash])),
+  );
+});
+test('verification still rejects unknown reserved paths, duplicate and invalid managed entries, and altered app hashes', async () => {
+  const base = Object.entries(hashes).map(([path, hash]) => ({ path, hash }));
+  const managed = {
+    path: '/__/firebase/init.js',
+    hash: 'b'.repeat(64),
+    status: 'ACTIVE',
+  };
+  for (const inventory of [
+    [...base, { ...managed, path: '/__/unexpected.js' }],
+    [...base, managed, managed],
+    [...base, { ...managed, hash: 'invalid' }],
+    [...base, { ...managed, status: 'NOT_UPLOADED' }],
+    base.map((f) => ({ ...f, hash: 'c'.repeat(64) })),
+  ]) {
+    await assert.rejects(
+      verifyStaged({
+        api: async (_method: string, path: string) =>
+          path === version ? remote : { files: inventory },
+        site,
+        version,
+        commit,
+        config,
+        files,
+      }),
+    );
+  }
 });
 test('immutable URL history cannot be changed or deleted, and revocations remove links', () => {
   const path = '/downloads/example/1.0.0/example.zip';
