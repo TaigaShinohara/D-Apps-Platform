@@ -1,4 +1,8 @@
-import { securityHeaders } from '../src/lib/security.mjs';
+import {
+  securityHeaders,
+  wavariumCspHeader,
+  wavariumPagePaths,
+} from '../src/lib/security.mjs';
 
 export function hostingConfig(downloads = []) {
   return {
@@ -15,21 +19,10 @@ export function hostingConfig(downloads = []) {
           'cache-control': 'public,max-age=0,s-maxage=300,must-revalidate',
         }).map(([key, value]) => ({ key, value })),
       },
-      {
-        // The WAV/ARIUM producer page is a self-contained page ported from a
-        // Muse Space: it needs inline styles, data-URI images, its own
-        // script and Google Fonts, which the site-wide policy forbids.
-        // Scope the relaxation to this path only; every other security
-        // header from the '**' rule still applies.
-        source: '/wavarium/**',
-        headers: [
-          {
-            key: 'content-security-policy',
-            value:
-              "default-src 'none'; script-src 'self'; style-src 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'; frame-ancestors 'none'",
-          },
-        ],
-      },
+      ...wavariumPagePaths.map((source) => ({
+        source,
+        headers: [{ key: 'content-security-policy', value: wavariumCspHeader }],
+      })),
       {
         source: '/_astro/**',
         headers: [

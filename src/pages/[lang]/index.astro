@@ -173,6 +173,23 @@ const platforms = [
     items={projects}
     lang={lang}
   />
+  <section class="showcase wrap" aria-labelledby="music-heading">
+    <div class="section-heading">
+      <h2 id="music-heading">{ja ? '音楽プロジェクト' : 'Music project'}</h2>
+    </div>
+    <article class="showcase-card">
+      <h3>
+        <a href="/wavarium/" hreflang="ja">
+          {ja ? 'WAV/ARIUM' : 'WAV/ARIUM (Japanese)'}
+        </a>
+      </h3>
+      <p class="card-summary">
+        {ja
+          ? '音楽集団 WAV/ARIUM のデビューに向けた制作の記録。'
+          : 'A production diary following music collective WAV/ARIUM toward its debut.'}
+      </p>
+    </article>
+  </section>
   <ShowcaseSection
     id="skills"
     title={ja ? 'AIエージェント向けスキル' : 'Skills for AI agents'}

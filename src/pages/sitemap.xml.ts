@@ -19,6 +19,7 @@ export const GET: APIRoute = ({ site }) => {
         `<url><loc>${new URL(`/${lang}/${path}`, site).href}</loc></url>`,
     ),
   );
+  entries.push(`<url><loc>${new URL('/wavarium/', site).href}</loc></url>`);
   return new Response(
     `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join('')}</urlset>`,
     { headers: { 'Content-Type': 'application/xml' } },

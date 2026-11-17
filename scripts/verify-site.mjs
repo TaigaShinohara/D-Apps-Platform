@@ -15,7 +15,7 @@ async function walk(directory) {
     pages++;
     const html = await readFile(path, 'utf8');
     if (
-      /<(?:iframe|form|input|textarea)\b|\son\w+=|<script[^>]*>\s*[^\s<]/i.test(
+      /<(?:iframe|form|input|textarea|style)\b|\s(?:on\w+|style)=|<script[^>]*>\s*[^\s<]/i.test(
         html,
       )
     )
@@ -25,6 +25,16 @@ async function walk(directory) {
       !html.includes('no-referrer')
     )
       throw new Error(`Missing privacy headers in ${path}`);
+    for (const [tag] of html.matchAll(
+      /<(?:link|img|script|source)\b[^>]*>/gi,
+    )) {
+      if (/^<link\b/i.test(tag) && /\srel="(?:canonical|alternate)"/i.test(tag))
+        continue;
+      for (const [, url] of tag.matchAll(/\s(?:href|src|srcset)="([^"]+)"/gi)) {
+        if (/(?:^|,\s*)(?:https?:\/\/|\/\/|data:)/i.test(url))
+          throw new Error(`Embedded or third-party subresource in ${path}`);
+      }
+    }
     for (const match of html.matchAll(/\s(?:src|href)="([^"#]*)[^"\n]*"/g)) {
       const value = match[1];
       if (manifest.revoked.includes(value))
@@ -38,8 +48,6 @@ async function walk(directory) {
         !manifest.downloads.includes(value)
       )
         throw new Error(`Broken internal link: ${value} in ${path}`);
-      if (/\ssrc=/.test(match[0]) && /^(https?:)?\/\//.test(value))
-        throw new Error(`Third-party subresource in ${path}`);
     }
   }
 }

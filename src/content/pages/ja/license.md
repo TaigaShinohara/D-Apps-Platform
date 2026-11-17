@@ -13,6 +13,10 @@ OneClipのコード、アプリアイコン、機能紹介画像は[OneClipの�
 
 今後掲載するアプリのライセンスやブランド素材の権利は、各詳細ページと配布元の記載に従います。サイトコードの公開は、すべてのアプリや商標を自由に利用できることを意味しません。
 
+## フォント
+
+WAV/ARIUMでは、[Zen Kaku Gothic New](/licenses/ZenKakuGothicNew-OFL.txt)と[Zen Maru Gothic](/licenses/ZenMaruGothic-OFL.txt)をSIL Open Font License 1.1のもとで配信しています。
+
 ## 技術ガイド
 
 設計・実装では[Google公式Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance)を参照しています。Googleや各ストアがこのサイトを運営・推奨していることを意味しません。

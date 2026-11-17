@@ -1,72 +1,43 @@
-(function () {
-  // water tank fill
-  var fill = document.getElementById('tankFill');
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function setFill() {
-    if (fill) fill.style.width = fill.getAttribute('data-w') + '%';
-  }
-  if (reduced) {
-    setFill();
-  } else if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(
-      function (es) {
-        es.forEach(function (e) {
-          if (e.isIntersecting) {
-            setFill();
-            io.disconnect();
-          }
-        });
-      },
-      { threshold: 0.3 },
-    );
-    if (fill) io.observe(fill);
-  } else {
-    setFill();
-  }
+const filterGroup = document.querySelector('.filters');
+const filterButtons = [...filterGroup.querySelectorAll('button[data-filter]')];
+const phases = [...document.querySelectorAll('.phase')];
+const filterStatus = document.getElementById('filterStatus');
 
-  // roadmap filter (wait bucket includes hold-phases marked data-status="wait")
-  var buttons = Array.prototype.slice.call(
-    document.querySelectorAll('.filters button'),
-  );
-  var phases = Array.prototype.slice.call(document.querySelectorAll('.phase'));
-  var emptyMsg = document.getElementById('emptyMsg');
-  buttons.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      buttons.forEach(function (b) {
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.setAttribute('aria-pressed', 'true');
-      var f = btn.getAttribute('data-filter');
-      var shown = 0;
-      phases.forEach(function (ph) {
-        var s = ph.getAttribute('data-status');
-        var match = f === 'all' || s === f || (f === 'wait' && s === 'wait');
-        ph.classList.toggle('hidden', !match);
-        if (match) shown++;
-      });
-      emptyMsg.classList.toggle('show', shown === 0);
-    });
+for (const button of filterButtons) {
+  button.addEventListener('click', () => {
+    for (const candidate of filterButtons) {
+      candidate.setAttribute('aria-pressed', String(candidate === button));
+    }
+    const { filter } = button.dataset;
+    let shown = 0;
+    for (const phase of phases) {
+      phase.hidden = filter !== 'all' && phase.dataset.status !== filter;
+      if (!phase.hidden) shown++;
+    }
+    filterStatus.textContent = `${phases.length}件中${shown}件を表示`;
   });
+}
+filterGroup.hidden = false;
 
-  // accordions
-  Array.prototype.forEach.call(
-    document.querySelectorAll('.phase-toggle'),
-    function (t) {
-      t.addEventListener('click', function () {
-        var open = t.getAttribute('aria-expanded') === 'true';
-        t.setAttribute('aria-expanded', String(!open));
-        var detail = t.parentElement.querySelector('.phase-detail');
-        if (detail) detail.classList.toggle('open', !open);
-      });
-    },
-  );
+const countdown = document.getElementById('bfCountdown');
+const dayStart = Date.parse(`${countdown.dateTime}T00:00:00+09:00`);
+const dayMs = 86_400_000;
+const remaining = dayStart - Date.now();
+if (remaining > 0) {
+  countdown.textContent = `あと${Math.ceil(remaining / dayMs)}日`;
+} else {
+  countdown.textContent = remaining > -dayMs ? '本日' : '終了';
+}
 
-  // Black Friday countdown (to 2026-11-27 JST)
-  var el = document.getElementById('bfDays');
-  if (el) {
-    var target = new Date('2026-11-27T00:00:00+09:00').getTime();
-    var now = Date.now();
-    var days = Math.ceil((target - now) / 86400000);
-    el.textContent = days > 0 ? String(days) : days === 0 ? '0' : '開催中';
-  }
-})();
+const fill = document.getElementById('tankFill');
+if (
+  'IntersectionObserver' in window &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+) {
+  const observer = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) return;
+    fill.classList.add('rise');
+    observer.disconnect();
+  });
+  observer.observe(fill);
+}
