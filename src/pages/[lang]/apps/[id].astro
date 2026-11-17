@@ -192,13 +192,15 @@ const hasPreview = app.distributions.some(
             {ja ? 'アプリのソースコード' : 'App source code'} ↗
           </a>
         )}
-        <a
-          class="external-link"
-          href={app.supportUrl}
-          rel="noopener noreferrer"
-        >
-          {ja ? 'サポートを見る' : 'Get support'} ↗
-        </a>
+        {app.supportUrl && (
+          <a
+            class="external-link"
+            href={app.supportUrl}
+            rel="noopener noreferrer"
+          >
+            {ja ? 'サポートを見る' : 'Get support'} ↗
+          </a>
+        )}
         <p class="fine-print">
           {ja
             ? '外部サイトには、それぞれのプライバシー方針が適用されます。'
