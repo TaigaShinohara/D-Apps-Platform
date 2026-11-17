@@ -1,6 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import AppIcon from '../../../components/AppIcon.astro';
+import AppHero from '../../../components/AppHero.astro';
 import DownloadLink from '../../../components/DownloadLink.astro';
 import {
   appDetails,
@@ -9,8 +9,6 @@ import {
   type App,
   type Locale,
 } from '../../../lib/catalog';
-import { Image } from 'astro:assets';
-import overview from '../../../assets/oneclip-overview.png';
 export function getStaticPaths() {
   return locales.flatMap((lang) =>
     appDetails.map((app) => ({ params: { lang, id: app.id }, props: { app } })),
@@ -37,22 +35,24 @@ const hasPreview = app.distributions.some(
     <a class="back-link" href={`/${lang}/#apps`}>
       ← {ja ? 'アプリ一覧' : 'All apps'}
     </a>
-    <section class="app-heading">
-      <AppIcon app={app} detail />
-      <div>
-        <p class="eyebrow">
-          {categories[app.category][lang]} /{' '}
-          {[...new Set(app.distributions.map((item) => item.platform))].join(
-            ' · ',
-          )}
-          {hasPreview && (ja ? ' · プレビュー版' : ' · Preview')}
-        </p>
-        <h1 id="content" tabindex="-1">
-          {app.name}
-        </h1>
-        <p class="app-tagline">{app.tagline[lang]}</p>
-      </div>
-    </section>
+    <AppHero
+      id={app.id}
+      name={app.name}
+      meta={[
+        categories[app.category][lang],
+        ...new Set(app.distributions.map((item) => item.platform)),
+        ...(hasPreview ? [ja ? 'プレビュー版' : 'Preview'] : []),
+      ].join(' · ')}
+      intro={app.tagline[lang]}
+      lang={lang}
+      getLabel={
+        app.distributions.length > 0
+          ? ja
+            ? '入手方法を見る'
+            : 'See how to get it'
+          : undefined
+      }
+    />
     {app.distributions.length === 0 && (
       <p>
         {ja
@@ -71,27 +71,6 @@ const hasPreview = app.distributions.some(
             </li>
           ))}
         </ul>
-        {app.id === 'oneclip' && (
-          <figure class="app-preview">
-            <Image
-              src={overview}
-              alt={
-                ja
-                  ? '2枚の画面を一枚にまとめ、番号・囲み・コメントで注釈を付けたOneClipの出力例'
-                  : 'OneClip output example: two captures combined with numbered notes, outlines, and comments'
-              }
-              widths={[600, 1000, 1400]}
-              sizes="(max-width: 760px) 100vw, 65vw"
-              format="webp"
-              loading="eager"
-            />
-            <figcaption>
-              {ja
-                ? '架空の画面を使った機能紹介です。実際の操作画面ではありません。'
-                : 'A feature illustration using fictional screens, not a screenshot of the app interface.'}
-            </figcaption>
-          </figure>
-        )}
         <section class="detail-section">
           <h2>{ja ? '使い始めるには' : 'Getting started'}</h2>
           <ol class="steps">
@@ -120,13 +99,12 @@ const hasPreview = app.distributions.some(
         </section>
       </div>
       <aside
+        id="get-app"
+        tabindex="-1"
         class="download-panel"
         aria-label={ja ? `${app.name}の配布情報` : `Where to get ${app.name}`}
       >
-        <p class="eyebrow" lang="en">
-          READY WHEN YOU ARE
-        </p>
-        <h2>{ja ? '使ってみる。' : 'Make it yours.'}</h2>
+        <h2>{ja ? '入手する' : 'Get the app'}</h2>
         <p>{app.price[lang]}</p>
         <dl>
           <dt>{ja ? '対応環境' : 'Requirements'}</dt>
