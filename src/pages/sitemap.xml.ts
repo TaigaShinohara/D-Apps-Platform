@@ -1,5 +1,7 @@
+import type { APIRoute } from 'astro';
 import { apps, locales } from '../lib/catalog';
-export function GET() {
+
+export const GET: APIRoute = ({ site }) => {
   const paths = [
     '',
     'about/',
@@ -9,8 +11,14 @@ export function GET() {
     'support/',
     ...apps.map((app) => `apps/${app.id}/`),
   ];
+  const entries = locales.flatMap((lang) =>
+    paths.map(
+      (path) =>
+        `<url><loc>${new URL(`/${lang}/${path}`, site).href}</loc></url>`,
+    ),
+  );
   return new Response(
-    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${locales.flatMap((lang) => paths.map((path) => `<url><loc>https://deepledeeple.com/${lang}/${path}</loc></url>`)).join('')}</urlset>`,
+    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join('')}</urlset>`,
     { headers: { 'Content-Type': 'application/xml' } },
   );
-}
+};

@@ -6,6 +6,7 @@ import { apps, appDetails } from '../../src/lib/catalog';
 import { readRevocations } from '../../src/lib/catalog-data.mjs';
 import { scriptIntegrity, securityHeaders } from '../../src/lib/security.mjs';
 const oneclipAvailable = apps.some((app) => app.id === 'oneclip');
+const canonicalOrigin = 'https://dobulab.com';
 
 for (const lang of ['ja', 'en']) {
   test(`${lang}: discover, switch language, verify download and privacy`, async ({
@@ -80,8 +81,21 @@ for (const lang of ['ja', 'en']) {
       await expect(page.locator('h1')).toHaveCount(1);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         'href',
-        `https://deepledeeple.com${path}`,
+        `${canonicalOrigin}${path}`,
       );
+      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+        'content',
+        `${canonicalOrigin}${path}`,
+      );
+      for (const alternate of ['ja', 'en', 'x-default']) {
+        const locale = alternate === 'x-default' ? 'ja' : alternate;
+        await expect(
+          page.locator(`link[rel="alternate"][hreflang="${alternate}"]`),
+        ).toHaveAttribute(
+          'href',
+          `${canonicalOrigin}${path.replace(`/${lang}/`, `/${locale}/`)}`,
+        );
+      }
       const other = lang === 'ja' ? 'en' : 'ja';
       await expect(
         page.locator(`.language-switch a[lang="${other}"]`),
