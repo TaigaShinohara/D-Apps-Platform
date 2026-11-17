@@ -1,8 +1,8 @@
 # Verification record
 
-Date: 2026-11-16. All website results below refer to a localhost production build, not the live domain. Build checks were preceded by process, memory and free-disk checks.
+Records: 2026-11-16–17. Website interaction results refer to a localhost production build; authenticated cloud checks are identified separately. Build checks were preceded by process, memory and free-disk checks.
 
-## Firebase migration checks (2026-11-17)
+## Firebase migration checks (2026-11-17, before cloud setup)
 
 - Astro/TypeScript: 0 errors, warnings or hints. ESLint/Prettier, production build and 16-page static inspection passed.
 - Node: 14 tests passed. Catalog/archive cases plus compressed-hash uploads, no publication during staging, malicious upload endpoints, cross-site versions, remote file/config/commit/live-version mismatch rejection, immutable URLs, retained revocations, tampered/unsigned binaries and symlink rejection.
@@ -14,7 +14,18 @@ Date: 2026-11-16. All website results below refer to a localhost production buil
 - Isolated revocation drill: a copied build with the real OneClip URL revoked passed all 16-page link checks and static-engine 404 checks, retained Japanese/English detail pages with a stopped-distribution notice, and omitted the ZIP. The production revocation list remained unchanged.
 - Secret scan and GitHub CI results are recorded with the migration PR. No Google service-account keys or account-specific credential files are tracked.
 
-No live Hosting version, Google billing link, credit redemption or DNS change has been performed. Managed TLS/CDN/headers/errors, account logging integrations, cloud IAM/OIDC behavior and actual rollback remain unverified. Previous Lighthouse/Safari observations below are historical; no new Lighthouse or full human visual/accessibility assessment is claimed for this migration.
+At the migration-only checkpoint, no cloud changes had been performed. The later setup record below supersedes that account/infrastructure status. Managed TLS/CDN/headers/errors and actual rollback remain unverified. Previous Lighthouse/Safari observations below are historical; no new Lighthouse or full human visual/accessibility assessment is claimed for this migration.
+
+## Dedicated cloud setup and staging integration (2026-11-17)
+
+- Owner-approved project/billing/Firebase/Hosting/SA/WIF provisioning completed. The refreshed Terraform plan had no changes. A too-long pool display name was shortened after the Google API rejected it.
+- Publisher user-managed keys: zero. Only standard `_Default`/`_Required` logging sinks were present, with no added export. Analytics details returned 404. Hosting releases/custom domains were empty and only the empty live channel existed. These are setup observations, not evidence of live visitor behavior.
+- The first GitHub authentication attempt rejected a legacy name-only subject. The repository's OIDC settings API reported `use_immutable_subject: true` and its exact prefix; Terraform now requires that ID-bearing production subject, retaining owner/repository IDs, main and the two workflow paths. Retesting successfully exchanged GitHub OIDC for the publisher's short-lived Google identity.
+- The authenticated macOS stage run passed original ZIP hash/signing/notarization/Gatekeeper and static checks. Finalization succeeded; strict inventory comparison then correctly stopped on two Google-managed additions (`/__/firebase/init.js` and `init.json`). The revised verifier records only these known entries separately and continues to reject all other unexpected files, altered application hashes, duplicates and invalid managed metadata.
+- Local regression coverage: 17 tests, including paginated inventories and the managed-file boundary. The final exact commit, finalized version, bundle labels and managed-file hashes belong in the [manual stage workflow report](https://github.com/TaigaShinohara/D-Apps-Platform/actions/workflows/stage-content.yml) and private operations record; a successful workflow is required before release.
+- Private Terraform state/config/lock backup was downloaded and checked against the source SHA-256. No credential files or private state are in Git or Actions artifacts.
+
+No live release or DNS change was performed for this setup. Full browser/device/human accessibility checks, OneClip launch/capture/save, public TLS/CDN/error behavior and recovery remain separate acceptance gates.
 
 ## Previous implementation checks (2026-11-16; AWS infrastructure retired)
 

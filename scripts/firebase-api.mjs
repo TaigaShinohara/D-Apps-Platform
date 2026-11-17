@@ -100,8 +100,22 @@ export async function stageVersion({
   });
   if (finalized.status !== 'FINALIZED')
     throw new Error('Version was not finalized');
-  await verifyStaged({ api, site, version, commit, config, files });
-  return { site, version, commit, labels, fileCount: entries.length };
+  const { managedFiles } = await verifyStaged({
+    api,
+    site,
+    version,
+    commit,
+    config,
+    files,
+  });
+  return {
+    site,
+    version,
+    commit,
+    labels,
+    fileCount: entries.length,
+    managedFiles,
+  };
 }
 export async function verifyStaged({
   api,
@@ -133,6 +147,8 @@ export async function verifyStaged({
       'Staged version/configuration does not match the reviewed build',
     );
   const actual = {};
+  const managedFiles = {};
+  const seen = new Set();
   let pageToken;
   let pages = 0;
   do {
@@ -143,13 +159,26 @@ export async function verifyStaged({
       `${version}/files?pageSize=1000${pageToken ? '&pageToken=' + encodeURIComponent(pageToken) : ''}`,
     );
     for (const file of response.files || []) {
-      if (actual[file.path]) throw new Error('Duplicate remote file path');
+      if (seen.has(file.path)) throw new Error('Duplicate remote file path');
+      seen.add(file.path);
+      // Hosting adds these documented SDK configuration routes itself.
+      // They are never uploaded/referenced by our site. Record them separately;
+      // all other paths, including unknown reserved paths, must match the build.
+      if (
+        ['/__/firebase/init.js', '/__/firebase/init.json'].includes(file.path)
+      ) {
+        if (!/^[a-f0-9]{64}$/.test(file.hash || '') || file.status !== 'ACTIVE')
+          throw new Error('Invalid Firebase-managed file metadata');
+        managedFiles[file.path] = file.hash;
+        continue;
+      }
       actual[file.path] = file.hash;
     }
     pageToken = response.nextPageToken;
   } while (pageToken);
   if (JSON.stringify(stable(actual)) !== JSON.stringify(stable(hashes)))
     throw new Error('Remote file hashes differ or include unexpected files');
+  return { managedFiles };
 }
 export async function releaseVersion(options) {
   // This is the only live publication call; staging never invokes it.
