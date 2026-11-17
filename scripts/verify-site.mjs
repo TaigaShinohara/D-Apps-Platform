@@ -2,14 +2,54 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const dangerousScheme = /^(?:javascript|data|vbscript|blob|file):/i;
+const namedReferences = new Map([
+  ['amp', '&'],
+  ['colon', ':'],
+  ['tab', '\t'],
+  ['newline', '\n'],
+]);
+
+function characterFromReference(codePoint, original) {
+  if (
+    !Number.isInteger(codePoint) ||
+    codePoint < 0 ||
+    codePoint > 0x10ffff ||
+    (codePoint >= 0xd800 && codePoint <= 0xdfff)
+  )
+    return original;
+  return String.fromCodePoint(codePoint);
+}
+
+function decodeCharacterReferences(value) {
+  return value.replace(
+    /&(?:#x([0-9a-f]{1,6})|#([0-9]{1,7})|([a-z][a-z0-9]*));?/gi,
+    (match, hex, decimal, name) => {
+      if (name) {
+        if (!match.endsWith(';')) return match;
+        return namedReferences.get(name.toLowerCase()) ?? match;
+      }
+      return characterFromReference(
+        hex ? Number.parseInt(hex, 16) : Number(decimal),
+        match,
+      );
+    },
+  );
+}
 
 function decodeScheme(value) {
-  return value
-    .trim()
-    .replace(/&colon;/gi, ':')
-    .replace(/&#0*58;?/gi, ':')
-    .replace(/&#x0*3a;?/gi, ':')
-    .replace(/\s+/g, '');
+  let decoded = value.trim();
+  for (let pass = 0; pass < 4; pass++) {
+    const next = decodeCharacterReferences(decoded);
+    if (next === decoded) break;
+    decoded = next;
+  }
+  let normalized = '';
+  for (const character of decoded) {
+    const code = character.codePointAt(0);
+    if (code <= 0x20 || code === 0x7f) continue;
+    normalized += character;
+  }
+  return normalized;
 }
 
 function attributeValues(html) {

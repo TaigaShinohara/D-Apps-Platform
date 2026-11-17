@@ -36,6 +36,13 @@ test('built pages reject dangerous link schemes and keep ordinary links', () => 
     'file:///tmp/x',
     'javascript&#58;alert(1)',
     'javascript&colon;alert(1)',
+    'jav&#97;script:alert(1)',
+    'jav&#x61;script:alert(1)',
+    'd&#97;ta:text/html,hello',
+    'vb&#115;cript:msgbox',
+    'java&#9;script:alert(1)',
+    'java&#x09;script:alert(1)',
+    'javascript&amp;colon;alert(1)',
   ]) {
     assert.throws(
       () => assertSafeDocument(`<a href="${href}">x</a>`, 'page.html'),
@@ -51,4 +58,7 @@ test('built pages reject dangerous link schemes and keep ordinary links', () => 
     /Disallowed link scheme/,
   );
   assert.doesNotThrow(() => assertSafeDocument(page, 'page.html'));
+  assert.doesNotThrow(() =>
+    assertSafeDocument('<a href="/ja/?q=&#97;">x</a>', 'page.html'),
+  );
 });
