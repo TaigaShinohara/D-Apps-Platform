@@ -2,8 +2,11 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { appDetails } from '../../src/lib/catalog';
-import { projects as showcasedProjects } from '../../src/data/showcase';
+import { appDetails, apps } from '../../src/lib/catalog';
+import {
+  projects as showcasedProjects,
+  skills as showcasedSkills,
+} from '../../src/data/showcase';
 import {
   readDirectDownloads,
   readRevocations,
@@ -342,6 +345,30 @@ test('the homepage distinguishes development projects and public skills from app
       'Simple Glass',
       'Minimal Information Design',
     ]);
+    const icons = page.locator(
+      '#apps .catalog-icon img, #projects .catalog-icon img, #skills .catalog-icon img',
+    );
+    await expect(icons).toHaveCount(
+      apps.length + showcasedProjects.length + showcasedSkills.length,
+    );
+    const iconSources = await icons.evaluateAll((images) =>
+      images.map((img) => ({
+        src: img.getAttribute('src'),
+        alt: img.getAttribute('alt'),
+      })),
+    );
+    expect(new Set(iconSources.map(({ src }) => src)).size).toBe(
+      iconSources.length,
+    );
+    await Promise.all(
+      iconSources.map(async ({ src, alt }) => {
+        expect(alt).toBe('');
+        expect(src).toMatch(/^\/(?:_astro|media)\//);
+        const response = await request.get(src!);
+        expect(response.ok(), src!).toBe(true);
+        expect(response.headers()['content-type']).toMatch(/^image\//);
+      }),
+    );
     await expect(
       skills.locator(`a[href="${github}skills-updater"]`),
     ).toBeVisible();
