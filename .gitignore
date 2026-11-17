@@ -14,3 +14,12 @@ auth/*.local.json
 .agents/
 infra/generated/
 *.log
+firebase.generated.json
+.firebase/
+gha-creds-*.json
+**/.terraform/
+**/*.tfstate*
+**/*.tfvars
+!**/example.tfvars
+**/tfplan
+firebase-debug.log*

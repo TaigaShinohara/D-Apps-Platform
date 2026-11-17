@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { readCatalog } from './catalog-data.mjs';
+import { readCatalog, readRevocations } from './catalog-data.mjs';
 
 export const locales = ['ja', 'en'] as const;
 export type Locale = (typeof locales)[number];
@@ -134,8 +134,23 @@ export const appSchema = z
   .strict();
 export type App = z.infer<typeof appSchema>;
 export type Distribution = z.infer<typeof distributionSchema>;
-export const apps: App[] = readCatalog().map((value) => appSchema.parse(value));
-if (new Set(apps.map((app) => app.id)).size !== apps.length)
+const revoked = readRevocations();
+export const appDetails: App[] = readCatalog({ includeRevoked: true }).map(
+  (value: unknown) => {
+    const app = appSchema.parse(value);
+    return {
+      ...app,
+      distributions: app.distributions.filter(
+        (item) =>
+          item.kind !== 'direct' || !revoked.includes(downloadPath(app, item)),
+      ),
+    };
+  },
+);
+export const apps: App[] = appDetails.filter(
+  (app) => app.distributions.length > 0,
+);
+if (new Set(appDetails.map((app) => app.id)).size !== appDetails.length)
   throw new Error('Duplicate app identifier.');
 export const categories: Record<App['category'], Record<Locale, string>> = {
   productivity: { ja: '仕事・効率化', en: 'Productivity' },

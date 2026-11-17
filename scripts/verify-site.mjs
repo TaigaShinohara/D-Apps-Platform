@@ -27,6 +27,10 @@ async function walk(directory) {
       throw new Error(`Missing privacy headers in ${path}`);
     for (const match of html.matchAll(/\s(?:src|href)="([^"#]*)[^"\n]*"/g)) {
       const value = match[1];
+      if (manifest.revoked.includes(value))
+        throw new Error(
+          `Remove the revoked download link: ${value} in ${path}`,
+        );
       if (
         value.startsWith('/') &&
         !value.startsWith('//') &&

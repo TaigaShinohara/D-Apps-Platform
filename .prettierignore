@@ -12,3 +12,6 @@ package-lock.json
 skills-lock.json
 public/media
 src/assets
+firebase.generated.json
+infra/gcp/.terraform
+infra/gcp/.terraform.lock.hcl

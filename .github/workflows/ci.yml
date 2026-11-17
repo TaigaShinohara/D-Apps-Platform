@@ -30,10 +30,27 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Verify immutable distribution history
+        env:
+          DISTRIBUTION_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npm run verify:distribution
+      - name: Check build resources
+        run: |
+          ps -eo pid,comm
+          df -h .
+          if command -v free >/dev/null; then free -h; else vm_stat; fi
       - run: npm run lint && npm run check && npm test && npm run build && npm run verify:site
       - run: npm audit --audit-level=moderate
-      - run: pipx run --spec cfn-lint==1.60.1 cfn-lint infra/generated/storage.json infra/generated/edge.json infra/generated/dns.json infra/generated/publisher.json infra/auth-readonly.json
       - run: npm run verify:release -- --fetch
+      - run: npm run verify:firebase
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: 1.17.2
+      - name: Validate infrastructure without cloud credentials
+        run: |
+          terraform -chdir=infra/gcp fmt -check
+          terraform -chdir=infra/gcp init -backend=false -input=false -lockfile=readonly
+          terraform -chdir=infra/gcp validate
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9

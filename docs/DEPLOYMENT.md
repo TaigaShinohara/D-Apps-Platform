@@ -1,80 +1,67 @@
-# AWS deployment and recovery
+# Firebase Hosting deployment and recovery
 
-**Status: prepared, not deployed.** Do not run resource-creating commands until the owner approves the reviewed release, account, costs and DNS changes. Merging this repository is independent of publishing the website.
+**Prepared locally; no Google resources, billing link, release or DNS change has been executed.** On 2026-11-17 the owner selected Firebase Hosting and accepted Google's retention of visitor IP data for a few months. Review the exact project, costs and DNS changes before execution approval. Git merges do not publish the site.
 
-## Generated stacks and reviewable changes
+## Architecture and privacy
 
-`npm run build` generates the following from `scripts/templates.mjs` and the actual static output. Templates are CI artifacts, not checked-in stale copies.
+Astro builds static pages/assets; Firebase Hosting delivers them and the original approved ZIPs through its CDN/TLS. No Firebase SDK, Analytics, database, Auth, Functions, Cloud Run backend or web app registration is required. The former AWS stacks, IAM proposal and publishing scripts are retired. No AWS resources were created during setup. Route 53 remains the existing domain/DNS manager.
 
-| Template         | Region                 | Changes                                                                                                                                                                                                                                              |
-| ---------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `storage.json`   | ap-northeast-1         | Two private S3 buckets, encryption, ownership controls, versioning and bucket policies. Public access is blocked. Only the bound distribution can read via OAC. Conditional create-only writes are enforced. Buckets are retained on stack deletion. |
-| `edge.json`      | us-east-1              | ACM certificate for apex/www with DNS-validation records in the existing zone; CloudFront, OAC, two Functions, WAF and a `FREE` PricingPlanManager subscription. Distribution starts disabled.                                                       |
-| `publisher.json` | ap-northeast-1         | GitHub OIDC content-publisher role scoped to this repository's `production` environment. No long-lived key, delete, DNS, IAM or distribution-update privileges. Uses an existing OIDC provider.                                                      |
-| `dns.json`       | Existing Route 53 zone | Four records only: apex/www A and AAAA aliases to the reviewed distribution. No NS, MX or TXT replacement. Apply only after pre-cutover tests.                                                                                                       |
+The operator collects no forms, accounts, uploads, tracking identifiers or visitor logs, and enables no additional analytics or request-log exports. Google's own Hosting service retains incoming IP data for a few months for abuse detection and usage analysis. This is an accepted, disclosed exception to the original provider-wide no-retention requirement. See [Firebase privacy](https://firebase.google.com/support/privacy). Review existing organization integrations/log exports before launch without disabling unrelated administrator auditing. Use aggregate traffic/storage/cost metrics.
 
-Free-plan eligibility and account contract are not established by successful template linting. `AWS::PricingPlanManager::Subscription` must become ACTIVE with PlanTier FREE and cover the intended distribution/WAF/zone. A failed Free subscription must stop the rollout; never remove it to fall back to paid delivery. Creating WAF before it is associated with the plan can have a short separately billed interval. Check that before execution.
+## Reviewable configuration
 
-## Prerequisites
+| Location                                | Purpose                                                                                                             |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `infra/gcp/main.tf`                     | Required APIs/Firebase on an existing dedicated project; Hosting site, publisher identity and restricted GitHub WIF |
+| `scripts/firebase-config.mjs`           | Shared security/cache headers, root redirect and trailing slashes; no server rewrites                               |
+| `firebase.generated.json`               | Generated local static-engine configuration, without project credentials                                            |
+| `infra/generated/firebase-serving.json` | Matching Hosting REST configuration                                                                                 |
+| `config/distribution-lock.json`         | Append-only size/SHA-256 records for immutable download URLs                                                        |
+| `config/revoked-downloads.json`         | Stopped URLs, removed from catalog links and staged files                                                           |
 
-Use the project's authenticated, least-privileged AWS connection. The workstation's default and `taiga_deeple_dev` STS calls returned `InvalidClientTokenId` during preparation; no valid project-specific AWS connection or hosted-zone ID was established. The owner selected a dedicated D-Apps connection. [AWS-AUTH.md](AWS-AUTH.md) documents its isolated local login and read-only entry. Do not substitute another project's administrator profile. Authentication is a separate prerequisite from authorization to publish.
-
-Record verified account ID, existing hosted-zone ID, existing records, existing GitHub OIDC provider ARN, Free-plan eligibility and payment-plan type in the private operations record. Never commit credentials or account-specific authentication files. With valid credentials, inspect only relevant resources:
+Terraform 1.17.2 and Google beta provider 8.11.0 are pinned. The provider lock is committed; state, plans, actual tfvars and credentials are ignored. Firebase resources require the beta provider. Validation is local and does not prove remote permissions or a successful cloud plan.
 
 ```sh
-aws sts get-caller-identity
-aws route53 list-hosted-zones-by-name --dns-name deepledeeple.com
-aws route53 list-resource-record-sets --hosted-zone-id "$D_APPS_ZONE_ID"
+terraform -chdir=infra/gcp init -backend=false -input=false -lockfile=readonly
+terraform -chdir=infra/gcp fmt -check
+terraform -chdir=infra/gcp validate
 ```
 
-Review CloudFront logging v2 delivery sources/destinations as well as legacy distribution logging; S3 server access logging, CloudTrail S3 **data** events (including organization trails/event data stores), WAF logging and sampled requests, and any organization-enforced telemetry. Do not disable unrelated account-wide auditing. If visitor requests would still be retained, stop and resolve that conflict before publishing. Management audit records and aggregate metrics may remain enabled.
+Terraform does not create/link billing, redeem credits, create the Cloud project, manage DNS or publish content. Adding Firebase to a project cannot be undone: use an owner-approved D-Apps-only project. Import an existing Firebase project/default site rather than creating duplicates. Service Usage API must already be usable for bootstrap. Keep state in an approved private location, never in GitHub artifacts. Terraform `prevent_destroy` protects the Firebase project/site; the Hosting site additionally uses its provider deletion-prevention policy.
+
+## Identity and publication limits
+
+Follow [the dedicated Google setup](GOOGLE-CLOUD-AUTH.md). Short-lived Workload Identity Federation replaces long-lived service-account keys. Trust requires repository ID `1459714940`, owner ID `178877625`, main, the production environment subject, and one of the two exact publishing workflow paths. Restrict the GitHub environment to main and owner approval. Pull-request CI has only content-read permission and no Google credentials.
+
+Firebase Hosting cannot be controlled with custom IAM roles. Its predefined `roles/firebasehosting.admin` can publish and delete Hosting resources. Staging and publishing are separate script/workflow steps, **not separate IAM privileges**. Restrict this role to the dedicated project and review protected-environment/workflow changes. It grants no Owner/Editor, billing, DNS or IAM administration. See [Hosting IAM limitations](https://firebase.google.com/docs/projects/iam/permissions#hosting).
+
+After reviewing Terraform outputs, set these non-secret production environment variables: `GCP_PROJECT_ID`, `FIREBASE_SITE_ID`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_PUBLISHER_SERVICE_ACCOUNT`. Credential files from the official Google action are ignored, automatically cleaned up and excluded from artifacts.
 
 ## Reviewed release sequence
 
-1. On a clean reviewed commit, run the README checks and `npm run verify:release -- --fetch --macos`. Complete OneClip basic launch/capture/export checks using synthetic data on a suitable test account; do not change its updater endpoint. Keep the verified ZIP unchanged.
-2. Inspect all generated templates with `cfn-lint`. Obtain change sets for each stack after explicit execution approval. `storage.json` must be in Tokyo; `edge.json` in us-east-1. CloudFormation change-set creation itself may require AWS permissions and is not done by local generation.
-3. Create the private storage stack with empty `DistributionArn`, then the edge stack with `EnableDistribution=false`, `ReleaseId=pending` and the verified zone/bucket parameters. ACM validation adds CNAME records; it does not cut over the apex/www site.
-4. Confirm the Free subscription is ACTIVE and its covered resources match. If unsupported/ineligible, leave delivery disabled and obtain a revised decision. Set `DistributionArn` in the storage stack to bind OAC to exactly this distribution.
-5. Create the publisher role using the verified existing OIDC provider. If no provider exists, review an account-level provider addition separately. Configure environment variables `AWS_PUBLISH_ROLE_ARN`, `SITE_BUCKET`, and `DOWNLOADS_BUCKET` in GitHub's `production` environment. They are identifiers, not secrets. The environment must allow only branch `main` and require owner review.
-6. Manually run `Stage verified content (manual)` from `main`, review the pending environment deployment and approve only the intended commit. macOS re-verifies signing before obtaining AWS OIDC credentials. The script writes `/releases/<full-commit-sha>/` and `/downloads/oneclip/1.0.1/OneClip-1.0.1.zip`, using `If-None-Match: *` and checksums. It refuses differing existing content. No public pointers change.
-7. Download the **matching** generated edge template from that workflow, review a change set with `ReleaseId=<full-commit-sha>` and `EnableDistribution=true`, and apply it. Function allowlists, script hashes and site origin path must come from the same build. Invalidate changed HTML and unversioned assets (`/*` is appropriate for this small site), then wait for distribution deployment and invalidation completion.
-8. Before changing DNS, test the apex host against the new distribution using `curl --connect-to` or an equivalent controlled host mapping so Host/SNI remain `deepledeeple.com`. Requests using the raw CloudFront hostname are intentionally rejected. Check direct S3 URLs return 403; verify 200 HTML/downloads, exact ZIP SHA-256, redirects, 404, prohibited methods, and 410 using a deliberately nonexistent test revocation. Confirm missing-origin 403/404/500 handling separately from function-generated 404s.
-9. Inspect existing apex/www records again. If records conflict, preserve them as a rollback record and review the precise replacement instead of deleting them blindly. Apply `dns.json` only after the review. Verify actual HTTPS, IPv4/IPv6, apex/www, certificate, policies, no cookies, no external subresources, aggregate metrics and all log settings again.
-10. Record the commit, template artifact, stack outputs, previous release, DNS rollback data, measured headers, hashes, Free-plan status and actual bill estimate in the private operations record. Mark production verified only after these checks pass.
+1. Complete [release readiness](RELEASE-READINESS.md), including account/credit checks and OneClip smoke testing. Run lint, type checks, unit tests, build, static checks, distribution-lock history checks, browser tests and dependency/secret scans on the reviewed commit.
+2. After execution approval, prepare the dedicated project and billing choice. Review a private Terraform plan for that exact project, importing existing Firebase/site resources as needed. Apply only the reviewed plan; do not enable Analytics in the console.
+3. Set up the protected GitHub environment. Run **Stage verified Firebase version (manual)** from the reviewed main commit. It verifies original ZIP size, SHA-256, archive boundaries, signing identity/team, notarization and Gatekeeper on macOS before obtaining Google credentials.
+4. Staging copies only built static files and approved original ZIPs, hashes compressed bytes for the Hosting API, uploads to the exact Google endpoint and finalizes a version. It creates **no live release or public preview channel**. Record the version name, commit and bundle digest from its report.
+5. Inspect the current live version, or confirm `NONE` for initial publication. After publication approval, run **Publish reviewed Firebase version (manual)** from the same main commit, with the finalized version and expected current live version. If main changed, stage again. Rebuilding and fresh ZIP verification precede comparing every remote file/hash, config and commit label. The script checks current live state, creates the release and reads it back.
+6. A release is public on `<site>.web.app` and `<site>.firebaseapp.com` immediately, before custom-domain DNS changes. These default hosts remain reachable; do not claim apex-only access. Publication approval is required even when the custom domain is not connected.
+7. Connect `deepledeeple.com` in Firebase Hosting and add `www.deepledeeple.com` as a redirect to the apex. Use the exact records returned by the console; do not invent DNS values. Retain Route 53 registration/nameservers and preserve existing SES MX, NS, TXT and unrelated records. Record the previous apex/www values/TTL before the narrowly reviewed DNS changes.
+8. Wait for domain/certificate status to become connected. Verify HTTP-to-HTTPS and www redirects, root/language navigation, normal/error headers, actual ZIP SHA-256, 404, cookies/subresources and non-GET/HEAD behavior on every live hostname. Inspect actual project integrations/log exports and billing/credit dashboards. Save observed versions, measurements and DNS rollback data in the private task record.
 
-Example post-approval stack execution pattern (identifiers are deliberately not filled in):
+Both manual workflows share one concurrency group. Hosting has no atomic compare-and-swap release precondition: the current-version check detects prior changes but cannot prevent a console release between calls. Use a single publisher and no concurrent out-of-band releases. If release/read-back fails, inspect current state before retrying.
 
-```sh
-aws cloudformation deploy --region ap-northeast-1 \
-  --stack-name d-apps-storage --template-file infra/generated/storage.json \
-  --no-execute-changeset
-```
+## Headers, caching and platform limits
 
-Review the change set before execution. Do not run this example as an authorization shortcut.
+The shared security module supplies CSP, nosniff, DENY framing, no-referrer, COOP/CORP and Permissions-Policy. HSTS starts at 300 seconds without includeSubDomains/preload. HTML, unversioned files and ZIPs require browser revalidation with a five-minute CDN TTL; hashed Astro assets use long immutable caching. Downloads have explicit attachment filenames; HTML retains meta CSP/no-referrer.
 
-## Security headers and errors
+Local verification uses Firebase's official static engine, `superstatic`, with the generated configuration. It checks rules, redirects, normal/custom-404 headers and downloads without cloud login. It does not simulate Google-managed TLS, reserved `/__/` paths, all platform errors, method behavior, abuse protections, IP retention or CDN invalidation. The site uses no reserved SDK/Auth routes. Verify managed redirects/errors and methods live; do not claim every header where unmeasured. Firebase configuration does not provide the former GET/HEAD-only allowlist. The local engine serves static content for other methods without mutating files; live behavior must be measured. No form or server API processes those bodies. No custom WAF rate limit or CAPTCHA/cookie challenge is configured or promised.
 
-HTTPS redirect, TLS 1.2 minimum, managed SecurityHeadersPolicy and viewer-response headers protect normal content. CSP forbids third-party resources, connections, forms, frames, objects, workers and unapproved scripts. Referrer policy is `no-referrer`, Permissions-Policy disables unused APIs, and COOP/CORP reduce cross-origin exposure. HSTS starts at 300 seconds, without includeSubDomains or preload; increase only after real-domain validation.
+## Stop, update and recover
 
-Viewer-response Functions do **not** run for every origin-error response. The managed policy remains a baseline and each HTML file carries a meta CSP/no-referrer, but that is not equivalent to every custom HTTP header on all errors. The managed policy can have a longer HSTS lifetime on an error response. Verify actual 403/404/500 and WAF responses before launch; do not claim uniform CSP or framing headers where unmeasured. Function-generated errors and revocations include the full header set.
+For a new version, append its URL/hash/size to the distribution lock and update release validation for that formal artifact. CI rejects changes/removal of existing lock entries and removal of prior revocations relative to the base commit. Hosting has no former S3 conditional-write policy: repository review and byte checks enforce URL immutability.
 
-GET/HEAD are the only accepted viewer methods. WAF uses KnownBadInputs, an IP-based rate limit (2,000 requests/5 minutes) and method blocking; logging and request sampling are disabled. Rate limiting necessarily processes IP addresses transiently within AWS. There is no CAPTCHA or cookie challenge. Tune the rate only using aggregate results and known legitimate download behavior.
+For an incident, append the affected URL to the revocation list and rebuild/stage/release. Catalog links are filtered, an app with no remaining distributions is hidden from the catalog while its detail/support page remains with a stopped-distribution notice, and the binary is excluded. Static inspection rejects lingering links. New releases invalidate the Hosting CDN; verify **404**, including GET/HEAD/range requests on apex/www and both default hosts. Do not promise 410 or recall of already downloaded files. No public preview channels should retain release binaries. See [Hosting cache behavior](https://firebase.google.com/docs/hosting/manage-cache).
 
-## Update and rollback
+For rollback, restore prior site content in a new reviewed commit while **retaining current revocations and the complete distribution lock**, then stage/release normally. A direct console rollback can resurrect stopped binaries and must not be used. Missing/mismatched files fail closed. Urgent hosting-disable actions require explicit owner approval and verification on every hostname. No destructive cleanup is automated.
 
-For normal updates, verify and stage artifacts first, then deploy the matching site release/function definitions. Versioned binaries and hashed assets have long immutable cache lifetimes; HTML and unversioned assets use short CDN caching and browser revalidation. The bucket policy disallows unconditional object creation, and the staging script refuses replacement. The content role cannot delete objects.
-
-For a site rollback, retrieve the previous **verified** commit's matching template artifact and site prefix, preserve current revocations, review the edge change set, switch `ReleaseId` and functions together, invalidate the affected URLs and verify both languages. The Free subscription must remain active. Retained buckets and versions are for recovery; do not delete them as part of rollback.
-
-For a dangerous app release, add its exact path to the revocation list and remove its published link in the same change. Apply the request function first, invalidate that URL, wait, and verify a 410 from every tested edge. Keep revocations when rolling back site content. A file already stored on someone's device cannot be recalled. If targeted blocking cannot be verified quickly, disable the distribution and confirm it is no longer serving content.
-
-For DNS rollback, restore only the recorded previous apex/www records; preserve unrelated DNS. DNS cache lifetimes and HSTS may delay recovery, so prefer restoring the prior verified content within the same distribution when possible.
-
-## Official references
-
-- [Private S3 origins with OAC](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html)
-- [Flat-rate plans and feature limits](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html)
-- [PricingPlanManager account requirements](https://docs.aws.amazon.com/PricingPlanManager/latest/UserGuide/plans.html)
-- [CloudFormation subscription resource](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-pricingplanmanager-subscription.html)
-- [S3 conditional-write enforcement](https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes-enforce.html)
-- [CloudFront Function security headers](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/example_cloudfront_functions_add_security_headers_section.html)
+References: [Hosting config](https://firebase.google.com/docs/hosting/full-config), [REST deployment](https://firebase.google.com/docs/hosting/api-deploy), [GitHub WIF](https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines).

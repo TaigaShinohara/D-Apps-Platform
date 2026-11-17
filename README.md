@@ -17,7 +17,9 @@ npm run lint
 npm test
 npm run build
 npm run verify:site
+npm run verify:distribution
 npm run verify:release -- --fetch
+npm run verify:firebase
 npm run preview
 ```
 
@@ -35,16 +37,18 @@ Mac の既存 Chrome を使う場合は `PLAYWRIGHT_USE_SYSTEM_CHROME=1` を設�
 
 - アプリ情報：`src/data/*.json`。日英の必須項目、公開判定、配布 URL をビルド時に検証します。
 - 運営ページ：`src/content/pages/{ja,en}/*.md`。対応する翻訳がない場合はビルドを止めます。
-- 配信停止：`config/revoked-downloads.json`。停止したダウンロードはエッジで 410 を返します。
+- 配信停止：`config/revoked-downloads.json`。停止した版はリンクと公開バンドルから除き、再公開後に 404 を確認します。
 - 直接配布：正式リリースの ZIP を加工せず、版ごとの URL で配布します。新しい配布物には検証スクリプト・公開判定・アップロード処理の更新が必要です。JSON の追加だけでは配布を有効にできません。
 - ストア配布：公式 HTTPS URL を登録します。架空のストア登録はテストだけに置き、公開データには含めません。
 
 ## 公開と運用
 
-**このリポジトリのマージは、AWS へのデプロイを実行しません。** CloudFormation はビルド時に `infra/generated/` に生成され、初期値では CloudFront 配信が無効です。`Stage verified content (manual)` は、承認付きの `production` 環境から検証済みファイルを配置するだけです。配信切替・DNS 変更には別の管理操作が必要です。
+**マージだけでは本番公開されません。** Google Firebase Hosting を採用し、手動ワークフローで検証済みの版を非公開で準備した後、別の手動ワークフローで公開します。両方とも `main` と承認付きの `production` 環境に限定します。Google Cloud の専用プロジェクト・請求先とクレジット適用は未設定です。
 
-- [AWS の構成・公開・復旧手順](docs/DEPLOYMENT.md)
-- [D-Apps 専用の AWS 認証入口](docs/AWS-AUTH.md)
+Google は Firebase Hosting の不正利用検出・利用状況分析のため、訪問者の IP アドレスを数か月保持します。この扱いは日英のプライバシー方針に明記しています。D-Apps は入力受付・追跡・追加の訪問者ログ保存を行いません。
+
+- [Firebase Hosting の構成・公開・復旧手順](docs/DEPLOYMENT.md)
+- [Google Cloud の専用認証とクレジット確認](docs/GOOGLE-CLOUD-AUTH.md)
 - [公開前の確認事項と費用の前提](docs/RELEASE-READINESS.md)
 - [検証記録](docs/QA.md)
 - [Google Modern Web Guidance の適用](docs/MODERN-WEB-GUIDANCE.md)

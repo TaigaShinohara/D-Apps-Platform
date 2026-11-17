@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.23.4"
+    "node": ">=24.22.1 <25"
   },
   "scripts": {
     "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev --host 127.0.0.1",
@@ -16,7 +16,10 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
     "verify:release": "node scripts/verify-release.mjs",
-    "verify:site": "node scripts/verify-site.mjs"
+    "verify:site": "node scripts/verify-site.mjs",
+    "prepare:hosting": "node scripts/prepare-hosting.mjs",
+    "verify:firebase": "node scripts/verify-firebase.mjs",
+    "verify:distribution": "node scripts/verify-distribution-lock.mjs"
   },
   "dependencies": {
     "astro": "7.4.12",
@@ -29,9 +32,11 @@
     "@playwright/test": "1.65.1",
     "eslint": "10.15.0",
     "globals": "17.14.0",
+    "google-auth-library": "11.3.4",
     "lighthouse": "13.6.0",
     "prettier": "3.10.1",
     "prettier-plugin-astro": "1.1.2",
+    "superstatic": "10.0.0",
     "tsx": "4.23.15",
     "typescript": "6.0.3"
   }
