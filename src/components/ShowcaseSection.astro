@@ -1,0 +1,52 @@
+---
+import type { ShowcaseEntry } from '../data/showcase';
+import type { Locale } from '../lib/catalog';
+
+interface Props {
+  id: 'projects' | 'skills';
+  title: string;
+  items: readonly ShowcaseEntry[];
+  lang: Locale;
+}
+
+const { id, title, items, lang } = Astro.props;
+const ja = lang === 'ja';
+const sourceAvailable = ja ? 'ソース公開' : 'Source available';
+const inDevelopment = ja ? '配布準備中' : 'In development';
+---
+
+<section id={id} class="showcase wrap" aria-labelledby={`${id}-heading`}>
+  <div class="section-heading">
+    <h2 id={`${id}-heading`}>{title}</h2>
+  </div>
+  <div class="app-grid">
+    {items.map((item) => (
+      <article class="showcase-card">
+        <h3>{item.name}</h3>
+        {(item.platform || item.status) && (
+          <p class="card-meta">
+            {item.platform && `${item.platform} · `}
+            {item.status?.[lang] ??
+              (item.repository ? sourceAvailable : inDevelopment)}
+          </p>
+        )}
+        <p class="card-summary">{item.summary[lang]}</p>
+        {item.members && (
+          <p class="card-meta showcase-members">{item.members.join(' · ')}</p>
+        )}
+        {item.repository && (
+          <a
+            class="text-link"
+            href={`https://github.com/TaigaShinohara/${item.repository}`}
+            rel="noopener noreferrer"
+          >
+            {ja ? 'GitHubで見る' : 'View on GitHub'}
+            <span class="sr-only"> {item.name}</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        )}
+      </article>
+    ))}
+  </div>
+  <slot />
+</section>
