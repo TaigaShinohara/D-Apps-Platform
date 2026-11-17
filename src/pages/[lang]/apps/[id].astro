@@ -119,7 +119,9 @@ const ja = lang === 'ja';
         class="download-panel"
         aria-label={ja ? `${app.name}のダウンロード` : `Download ${app.name}`}
       >
-        <p class="eyebrow">READY WHEN YOU ARE</p>
+        <p class="eyebrow" lang="en">
+          READY WHEN YOU ARE
+        </p>
         <h2>{ja ? '使ってみる。' : 'Make it yours.'}</h2>
         <p>{app.price[lang]}</p>
         <dl>

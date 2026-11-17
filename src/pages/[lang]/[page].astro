@@ -49,7 +49,9 @@ const lang = Astro.params.lang as Locale;
     <a class="back-link" href={`/${lang}/`}>
       ← {lang === 'ja' ? 'ホーム' : 'Home'}
     </a>
-    <p class="eyebrow">D-APPS / {Astro.params.page?.toUpperCase()}</p>
+    <p class="eyebrow" lang="en">
+      D-APPS / {Astro.params.page?.toUpperCase()}
+    </p>
     <h1 id="content" tabindex="-1">
       {frontmatter.title}
     </h1>

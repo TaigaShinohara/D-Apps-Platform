@@ -22,6 +22,14 @@ export default defineConfig({
       },
     },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    ...(process.env.PLAYWRIGHT_INCLUDE_EDGE
+      ? [
+          {
+            name: 'edge',
+            use: { ...devices['Desktop Edge'], channel: 'msedge' },
+          },
+        ]
+      : []),
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     {
       name: 'mobile',

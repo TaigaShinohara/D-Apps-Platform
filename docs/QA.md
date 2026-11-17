@@ -2,6 +2,31 @@
 
 Records: 2026-11-16–17. Website interaction results refer to a localhost production build; authenticated cloud checks are identified separately. Build checks were preceded by process, memory and free-disk checks.
 
+## Website readiness (2026-11-17, after cloud setup)
+
+- Scope: finish the website before the separate OneClip launch/capture/save smoke test. No Hosting release, public preview or DNS change was part of this pass.
+- Type checking: 0 errors/warnings/hints; lint, 17 unit tests, build, 16-page internal-link/privacy inspection and Firebase static-engine checks passed.
+- Local Playwright: 44 passed using installed Chrome, Firefox, WebKit and mobile WebKit. The first attempt omitted the existing SSD browser-cache path and could not launch Firefox/WebKit; rerunning with `PLAYWRIGHT_BROWSERS_PATH="$PWD/.playwright"` passed. This was an environment-path error, not a website failure.
+- Coverage expanded from home/app/privacy to all 14 localized pages: axe WCAG A/AA checks, page language, one H1, canonical and matching language links, skip-link focus, 320 CSS-pixel width and 200% text with a wide fallback font. All tested pages had no unwanted external requests, cookies, localStorage or sessionStorage. The bilingual 404 and keyboard expansion/collapse of file-verification details are also covered.
+- CI additionally installs actual Microsoft Edge and runs the same suite with `PLAYWRIGHT_INCLUDE_EDGE=1`; its result is recorded by the PR check. The local Mac has no Edge installation. WebKit emulation is not claimed as an iPhone hardware test.
+- Native Safari: keyboard-only skip-to-content → collection → OneClip navigation; English switching, file-hash disclosure and privacy navigation passed. Safari's accessibility tree exposed headings, lists, download names and image descriptions. This is agent-operated UI verification, not a user acceptance test.
+- VoiceOver: the initial prompt and running application were reached, but spoken output/rotor behavior could not be independently observed through the available controls. No screen-reader pass is claimed. The VoiceOver setting was explicitly restored to **off** and observed in System Settings. Physical mobile use and human screen-reader experience remain unverified.
+- Visual review: refreshed Japanese/English home, Japanese OneClip and 390px mobile screenshots were reviewed for clipping, navigation and download visibility. The reference screenshots below are from this pass; previous PNG files are historical.
+- All ten unique external links in the generated pages returned HTTP 200 without changing destination, including the original OneClip release, support and verification notes. This confirms link reachability, not the content or future availability of third-party pages.
+- Firebase custom-domain **validate-only** calls for apex and www returned 200; the subsequent custom-domain list remained empty. No DNS values were returned, so none are invented in the [cutover review](DOMAIN-CUTOVER.md). Public DNS confirmed existing SES MX and SPF that must be preserved.
+
+Updated local Lighthouse 13.6.0 measurements used the same mobile/DevTools throttling conditions documented below, with no runtime error:
+
+| Page             | Performance | Accessibility | LCP    | CLS |
+| ---------------- | ----------- | ------------- | ------ | --- |
+| Japanese home    | 100         | 100           | 1.54 s | 0   |
+| English home     | 99          | 100           | 1.60 s | 0   |
+| Japanese OneClip | 99          | 100           | 1.59 s | 0   |
+
+Reports and DNS/link evidence are in ignored `.artifacts/qa/site-readiness/`. These are local single-run lab results, not production or field measurements. The exact merged commit and fresh unpublished version belong in the staging workflow report/private task record after integration.
+
+Current screens: [Japanese home](screens/home-ja.jpg), [English home](screens/home-en.jpg), [OneClip detail](screens/oneclip-ja.jpg), [mobile home](screens/mobile-ja.jpg), [mobile download](screens/mobile-oneclip-ja.jpg).
+
 ## Firebase migration checks (2026-11-17, before cloud setup)
 
 - Astro/TypeScript: 0 errors, warnings or hints. ESLint/Prettier, production build and 16-page static inspection passed.

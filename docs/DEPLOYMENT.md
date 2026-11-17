@@ -39,6 +39,8 @@ After reviewing Terraform outputs, set these non-secret production environment v
 
 ## Reviewed release sequence
 
+Initial project/billing/WIF setup below is already complete; do not repeat provisioning on each release. For the initial domain connection, use [the DNS review and cutover record](DOMAIN-CUTOVER.md), preserving the existing mail records.
+
 1. Complete [release readiness](RELEASE-READINESS.md), including account/credit checks and OneClip smoke testing. Run lint, type checks, unit tests, build, static checks, distribution-lock history checks, browser tests and dependency/secret scans on the reviewed commit.
 2. After execution approval, prepare the dedicated project and billing choice. Review a private Terraform plan for that exact project, importing existing Firebase/site resources as needed. Apply only the reviewed plan; do not enable Analytics in the console.
 3. Set up the protected GitHub environment. Run **Stage verified Firebase version (manual)** from the reviewed main commit. It verifies original ZIP size, SHA-256, archive boundaries, signing identity/team, notarization and Gatekeeper on macOS before obtaining Google credentials.
