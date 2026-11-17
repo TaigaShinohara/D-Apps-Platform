@@ -16,7 +16,7 @@ US$10 は料金への充当で、強制的な支出上限ではありません�
 
 初期設定は対象プロジェクトを明示し、既存の本人セッションから Cloud Shell の一時認証を使いました。長期サービスアカウントキーは作りません。自動認証が必要な場合はユーザーの 1Password 共通手順とプロジェクトごとのアクセス範囲を守ります。今回の `prepare_worktree.py` は `SKIPPED_UNREGISTERED` であり、登録済み資格情報があるとは扱いません。
 
-通常の公開は GitHub OIDC → Google WIF → 専用 Hosting publisher です。Terraform は秘密キーを作成・保存しません。認証の成功、クラウド変更の許可、サイト公開の承認を区別します。
+通常の公開は GitHub OIDC → Google WIF です。ステージ用ワークフローは `staging` 環境の subject からステージ用アカウントだけを借り、公開用ワークフローは `production` 環境の subject から公開用アカウントだけを借ります。Terraform は秘密キーを作成・保存しません。認証の成功、クラウド変更の許可、サイト公開の承認を区別します。
 
 ## 本人が確認する対象
 
@@ -27,4 +27,4 @@ US$10 は料金への充当で、強制的な支出上限ではありません�
 
 Route 53 は当面ドメイン/DNS 管理として残します。Google 側の確認だけのために AWS root へログインする必要はありません。
 
-GitHub の OIDC 設定 API で `use_immutable_subject: true` を確認済みです。WIF の subject は名前だけの旧形式ではなく、所有者 ID とリポジトリ ID を含む完全一致を使います。main・production・指定ワークフローの条件も維持します。[GitHub の不変 subject 仕様](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims)を参照してください。
+GitHub の OIDC 設定 API で `use_immutable_subject: true` を確認済みです。WIF の subject は名前だけの旧形式ではなく、所有者 ID とリポジトリ ID を含む完全一致を使います。ステージは `staging`、公開は `production` にそれぞれ結び、相手のワークフローでは借りられません。変更後の適用手順は [公開手順のチェックリスト](DEPLOYMENT.md#owner-checklist-before-the-next-stage-or-release) にあります。[GitHub の不変 subject 仕様](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims)を参照してください。

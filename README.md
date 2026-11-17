@@ -45,7 +45,7 @@ Microsoft Edge も確認する環境では `npx playwright install msedge` の�
 
 ## 公開と運用
 
-[dobulab.com](https://dobulab.com/ja/) は2026年11月17日に Google Firebase Hosting で公開しました。`www.dobulab.com` は正規ドメインに転送します。更新時は `main` の検証済みの版を手動ワークフローでステージし、承認付きの `production` 環境で別の手動ワークフローから公開します。**マージだけでは本番の配信内容は変わりません。**
+[dobulab.com](https://dobulab.com/ja/) は2026年11月17日に Google Firebase Hosting で公開しました。`www.dobulab.com` は正規ドメインに転送します。更新時は `main` の検証済みの版を `staging` 環境の手動ワークフローでステージし、`production` 環境の別の手動ワークフローから公開します。**マージだけでは本番の配信内容は変わりません。**
 
 Google は Firebase Hosting の不正利用検出・利用状況分析のため、訪問者の IP アドレスを数か月保持します。この扱いは日英のプライバシー方針に明記しています。D-Apps は入力受付・追跡・追加の訪問者ログ保存を行いません。
 

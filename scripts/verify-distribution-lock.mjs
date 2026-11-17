@@ -7,6 +7,18 @@ export function verifyRevocationHistory(current, previous) {
     throw new Error('Previously revoked downloads must remain revoked');
 }
 
+export function assertComparisonBase(base, required) {
+  const present = typeof base === 'string' && base.length > 0;
+  if (!required && !present) return '';
+  if (!/^[a-f0-9]{40}$/.test(base || '') || (required && /^0{40}$/.test(base)))
+    throw new Error(
+      required
+        ? 'Previous main commit is required before staging or publishing'
+        : 'Full base commit SHA required',
+    );
+  return base;
+}
+
 export function verifyLock(current, previous = {}) {
   for (const [path, record] of Object.entries(previous)) {
     if (
@@ -33,11 +45,14 @@ if (process.argv[1]?.endsWith('/verify-distribution-lock.mjs')) {
     await readFile('config/distribution-lock.json', 'utf8'),
   );
   let previous = {};
-  const base = process.env.DISTRIBUTION_BASE_SHA;
+  const required = process.env.DISTRIBUTION_REQUIRE_BASE === '1';
+  const base = assertComparisonBase(
+    process.env.DISTRIBUTION_BASE_SHA,
+    required,
+  );
   if (base) {
-    if (!/^[a-f0-9]{40}$/.test(base))
-      throw new Error('Full base commit SHA required');
-    // Before the migration commit the lock did not exist. Only that absence is allowed.
+    // Before the migration commit the lock did not exist. Only CI, which does
+    // not set DISTRIBUTION_REQUIRE_BASE, may treat that absence as empty history.
     const files = execFileSync(
       'git',
       ['ls-tree', '--name-only', base, 'config/distribution-lock.json'],
@@ -49,6 +64,8 @@ if (process.argv[1]?.endsWith('/verify-distribution-lock.mjs')) {
           encoding: 'utf8',
         }),
       );
+    else if (required)
+      throw new Error('Previous commit has no distribution lock');
     const previousRevocations = JSON.parse(
       execFileSync('git', ['show', `${base}:config/revoked-downloads.json`], {
         encoding: 'utf8',
