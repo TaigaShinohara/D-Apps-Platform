@@ -58,47 +58,103 @@ for (const lang of ['ja', 'en']) {
   });
   test(`${lang}: accessible structure and layout at narrow widths and enlarged text`, async ({
     page,
+    context,
+    browserName,
   }) => {
+    test.setTimeout(120_000);
+    const external: string[] = [];
+    page.on('request', (request) => {
+      if (new URL(request.url()).origin !== 'http://127.0.0.1:4321')
+        external.push(request.url());
+    });
     for (const path of [
       `/${lang}/`,
       ...appDetails.map((app) => `/${lang}/apps/${app.id}/`),
-      `/${lang}/privacy/`,
+      ...['about', 'privacy', 'safety', 'license', 'support'].map(
+        (slug) => `/${lang}/${slug}/`,
+      ),
     ]) {
-      await page.goto(path);
+      const response = await page.goto(path);
+      expect(response!.status(), path).toBe(200);
+      await expect(page.locator('html')).toHaveAttribute('lang', lang);
+      await expect(page.locator('h1')).toHaveCount(1);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        'href',
+        `https://deepledeeple.com${path}`,
+      );
+      const other = lang === 'ja' ? 'en' : 'ja';
+      await expect(
+        page.locator(`.language-switch a[lang="${other}"]`),
+      ).toHaveAttribute('href', path.replace(`/${lang}/`, `/${other}/`));
       const result = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
         .analyze();
-      expect(result.violations).toEqual([]);
+      expect(result.violations, path).toEqual([]);
+      await page.keyboard.press(
+        browserName === 'webkit' && process.platform === 'darwin'
+          ? 'Alt+Tab'
+          : 'Tab',
+      );
+      await expect(page.locator('.skip-link')).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(page.locator('#content')).toBeFocused();
+      await page.setViewportSize({ width: 320, height: 720 });
+      // Test actual text reflow, including the site's longest legal paragraphs.
+      for (const enlarged of [false, true]) {
+        if (enlarged)
+          await page.evaluate(() => {
+            document.documentElement.style.fontSize = '32px';
+            document.documentElement.style.fontFamily = 'Verdana, sans-serif';
+          });
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+          path,
+        ).toBe(true);
+      }
+      await expect(page.locator('h1')).toBeVisible();
+      await expect(
+        page.locator(`.language-switch a[lang="${other}"]`),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(() => ({
+          local: localStorage.length,
+          session: sessionStorage.length,
+        })),
+        path,
+      ).toEqual({ local: 0, session: 0 });
     }
-    await page.setViewportSize({ width: 320, height: 720 });
-    await page.goto(oneclipAvailable ? `/${lang}/apps/oneclip/` : `/${lang}/`);
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= window.innerWidth,
-      ),
-    ).toBe(true);
-    // Browser devtools-style enlargement, kept outside production code.
-    await page.evaluate(() => {
-      document.documentElement.style.fontSize = '32px';
-    });
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= window.innerWidth,
-      ),
-    ).toBe(true);
-    if (oneclipAvailable)
-      await expect(page.locator('a[download]')).toBeVisible();
-    // A wider fallback font reproduces the Linux reflow regression on macOS too.
-    await page.evaluate(() => {
-      document.documentElement.style.fontFamily = 'Verdana, sans-serif';
-    });
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= window.innerWidth,
-      ),
-    ).toBe(true);
+    expect(await context.cookies()).toEqual([]);
+    expect(external).toEqual([]);
   });
 }
+test('file verification disclosure works from the keyboard', async ({
+  page,
+}) => {
+  test.skip(!oneclipAvailable, 'OneClip distribution is currently stopped');
+  await page.goto('/ja/apps/oneclip/');
+  const summary = page.locator('summary');
+  await summary.focus();
+  await summary.press('Enter');
+  await expect(page.locator('details')).toHaveAttribute('open', '');
+  await expect(page.locator('.hash')).toHaveText(
+    '231818840a6e122cc5eb7a2743cf236a1608a62472a6df6140f167e4114e29ed',
+  );
+  await summary.press('Space');
+  await expect(page.locator('details')).not.toHaveAttribute('open', '');
+});
+test('404 offers both language homes without tracking', async ({ page }) => {
+  const response = await page.goto('/missing-page');
+  expect(response!.status()).toBe(404);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    'content',
+    'noindex',
+  );
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole('link', { name: 'English home', exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/$/);
+});
 test('critical navigation and download work without JavaScript', async ({
   browser,
 }) => {

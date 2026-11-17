@@ -115,13 +115,15 @@ const platforms = [
     </p>
     <p>
       <span aria-hidden="true">◇</span>
-      {ja ? '解析SDKは使いません。' : 'No analytics SDKs.'}
+      {ja ? '行動の追跡はしません。' : 'No behavioral tracking.'}
     </p>
   </div>
   <section id="apps" class="catalog wrap">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">THE COLLECTION</p>
+        <p class="eyebrow" lang="en">
+          THE COLLECTION
+        </p>
         <h2>
           {ja
             ? '暮らしと仕事に、小さなプラス。'
@@ -136,18 +138,18 @@ const platforms = [
     {filters && (
       <>
         <div class="filters" data-filters hidden>
-          <label>
+          <label for="category">
             {ja ? 'カテゴリ' : 'Category'}
-            <select data-category>
+            <select id="category" data-category>
               <option value="">{ja ? 'すべて' : 'All'}</option>
               {categoryKeys.map((key) => (
                 <option value={key}>{categories[key][lang]}</option>
               ))}
             </select>
           </label>
-          <label>
+          <label for="platform">
             {ja ? '対応OS' : 'Platform'}
-            <select data-platform>
+            <select id="platform" data-platform>
               <option value="">{ja ? 'すべて' : 'All'}</option>
               {platforms.map((platform) => (
                 <option value={platform}>{platform}</option>
@@ -175,7 +177,9 @@ const platforms = [
       d.
     </div>
     <div>
-      <p class="eyebrow">OPEN BY DESIGN</p>
+      <p class="eyebrow" lang="en">
+        OPEN BY DESIGN
+      </p>
       <h2>
         {ja
           ? '使う前から、わかることを大切に。'

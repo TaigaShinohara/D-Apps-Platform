@@ -33,6 +33,8 @@ npm audit --audit-level=moderate
 
 Mac の既存 Chrome を使う場合は `PLAYWRIGHT_USE_SYSTEM_CHROME=1` を設定します。ブラウザの保存場所を変更した場合はインストールと実行で同じ `PLAYWRIGHT_BROWSERS_PATH` を使用します。ビルドの前には、実行中のビルド・メモリ・ディスク空き容量を確認してください。
 
+Microsoft Edge も確認する環境では `npx playwright install msedge` の後に `PLAYWRIGHT_INCLUDE_EDGE=1 npm run test:e2e` を実行します。CI はこの設定で Edge を含めます。ブラウザ導入は実行環境のシステム領域に影響するため、この Mac に追加することは必須にしていません。
+
 ## 更新する
 
 - アプリ情報：`src/data/*.json`。日英の必須項目、公開判定、配布 URL をビルド時に検証します。
@@ -43,13 +45,14 @@ Mac の既存 Chrome を使う場合は `PLAYWRIGHT_USE_SYSTEM_CHROME=1` を設�
 
 ## 公開と運用
 
-**マージだけでは本番公開されません。** Google Firebase Hosting を採用し、手動ワークフローで検証済みの版を非公開で準備した後、別の手動ワークフローで公開します。両方とも `main` と承認付きの `production` 環境に限定します。Google Cloud の専用プロジェクト・請求先とクレジット適用は未設定です。
+**マージだけでは本番公開されません。** Google Firebase Hosting を採用し、手動ワークフローで検証済みの版を非公開で準備した後、別の手動ワークフローで公開します。両方とも `main` と承認付きの `production` 環境に限定します。2026年11月17日、本人承認の専用プロジェクト・請求先接続・クレジット適用・非公開ステージまで完了しました。本番公開とDNS接続は未実施です。
 
 Google は Firebase Hosting の不正利用検出・利用状況分析のため、訪問者の IP アドレスを数か月保持します。この扱いは日英のプライバシー方針に明記しています。D-Apps は入力受付・追跡・追加の訪問者ログ保存を行いません。
 
 - [Firebase Hosting の構成・公開・復旧手順](docs/DEPLOYMENT.md)
 - [Google Cloud の専用認証とクレジット確認](docs/GOOGLE-CLOUD-AUTH.md)
 - [公開前の確認事項と費用の前提](docs/RELEASE-READINESS.md)
+- [ドメイン接続の確認資料と切戻し](docs/DOMAIN-CUTOVER.md)
 - [検証記録](docs/QA.md)
 - [Google Modern Web Guidance の適用](docs/MODERN-WEB-GUIDANCE.md)
 - [脆弱性の報告](SECURITY.md)
