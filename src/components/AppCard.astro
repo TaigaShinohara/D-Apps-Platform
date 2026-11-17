@@ -1,6 +1,8 @@
 ---
 import type { App, Locale } from '../lib/catalog';
 import { categories } from '../lib/catalog';
+import { distributionKindLabel } from '../lib/distribution';
+import AppIcon from './AppIcon.astro';
 interface Props {
   app: App;
   lang: Locale;
@@ -15,14 +17,7 @@ const platforms = [...new Set(app.distributions.map((d) => d.platform))];
   data-category={app.category}
   data-platforms={platforms.join(',')}
 >
-  <img
-    class="app-icon"
-    src={`/media/${app.id}-icon.png`}
-    width="80"
-    height="80"
-    alt=""
-    loading="lazy"
-  />
+  <AppIcon app={app} />
   <header>
     <p class="eyebrow">{categories[app.category][lang]}</p>
     <h3>
@@ -38,15 +33,7 @@ const platforms = [...new Set(app.distributions.map((d) => d.platform))];
       <span aria-hidden="true"> · </span>
       {[
         ...new Set(
-          app.distributions.map((item) =>
-            item.kind === 'direct'
-              ? lang === 'ja'
-                ? '直接配布'
-                : 'Direct download'
-              : lang === 'ja'
-                ? '公式ストア'
-                : 'Official store',
-          ),
+          app.distributions.map((item) => distributionKindLabel(item, lang)),
         ),
       ].join(' / ')}
     </p>

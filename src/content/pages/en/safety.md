@@ -7,7 +7,7 @@ description: Clear sources, explicit checks, and no instructions to weaken your 
 
 Direct downloads are checked against the developer’s official release. We publish the version, size, SHA-256, supported platforms, signing and notarization information, and original release page. We do not repackage apps or bundle other software.
 
-Store links lead to official product pages. We do not use shortened URLs, advertising detours, or automatic downloads.
+Links to stores, web apps, and public GitHub previews lead to pages published by the developer. Each preview listing shows the release and the scope of its checks. We do not use shortened URLs, advertising detours, or automatic downloads.
 
 ## Be precise about verification
 

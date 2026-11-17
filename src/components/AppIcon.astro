@@ -1,0 +1,27 @@
+---
+import type { App } from '../lib/catalog';
+
+interface Props {
+  app: App;
+  detail?: boolean;
+}
+
+const { app, detail = false } = Astro.props;
+const size = detail ? 112 : 80;
+const className = detail ? 'detail-icon' : 'app-icon';
+---
+
+{app.iconFallback ? (
+  <span class:list={[className, 'app-icon-fallback']} aria-hidden="true">
+    {app.iconFallback}
+  </span>
+) : (
+  <img
+    class={className}
+    src={`/media/${app.id}-icon.png`}
+    width={size}
+    height={size}
+    alt=""
+    loading={detail ? undefined : 'lazy'}
+  />
+)}

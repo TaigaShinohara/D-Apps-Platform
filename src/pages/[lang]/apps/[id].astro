@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import AppIcon from '../../../components/AppIcon.astro';
 import DownloadLink from '../../../components/DownloadLink.astro';
 import {
   appDetails,
@@ -18,6 +19,12 @@ export function getStaticPaths() {
 const { app } = Astro.props as { app: App };
 const lang = Astro.params.lang as Locale;
 const ja = lang === 'ja';
+const hasDirectDownload = app.distributions.some(
+  (item) => item.kind === 'direct',
+);
+const hasPreview = app.distributions.some(
+  (item) => item.kind === 'github-preview',
+);
 ---
 
 <Layout
@@ -31,19 +38,14 @@ const ja = lang === 'ja';
       ← {ja ? 'アプリ一覧' : 'All apps'}
     </a>
     <section class="app-heading">
-      <img
-        class="detail-icon"
-        src={`/media/${app.id}-icon.png`}
-        width="112"
-        height="112"
-        alt=""
-      />
+      <AppIcon app={app} detail />
       <div>
         <p class="eyebrow">
           {categories[app.category][lang]} /{' '}
           {[...new Set(app.distributions.map((item) => item.platform))].join(
             ' · ',
           )}
+          {hasPreview && (ja ? ' · プレビュー版' : ' · Preview')}
         </p>
         <h1 id="content" tabindex="-1">
           {app.name}
@@ -108,16 +110,18 @@ const ja = lang === 'ja';
         <section class="detail-section">
           <h2>{ja ? '知っておいてほしいこと' : 'Before you install'}</h2>
           <p>{app.limitations[lang]}</p>
-          <p>
-            {ja
-              ? '署名と公証は配布元を確認する手がかりであり、すべての不具合や危険がないことを保証するものではありません。'
-              : 'Signing and notarization help verify the publisher. They do not guarantee that software is free of every defect or risk.'}
-          </p>
+          {hasDirectDownload && (
+            <p>
+              {ja
+                ? '署名と公証は配布元を確認する手がかりであり、すべての不具合や危険がないことを保証するものではありません。'
+                : 'Signing and notarization help verify the publisher. They do not guarantee that software is free of every defect or risk.'}
+            </p>
+          )}
         </section>
       </div>
       <aside
         class="download-panel"
-        aria-label={ja ? `${app.name}のダウンロード` : `Download ${app.name}`}
+        aria-label={ja ? `${app.name}の配布情報` : `Where to get ${app.name}`}
       >
         <p class="eyebrow" lang="en">
           READY WHEN YOU ARE
@@ -127,7 +131,7 @@ const ja = lang === 'ja';
         <dl>
           <dt>{ja ? '対応環境' : 'Requirements'}</dt>
           <dd>{app.requirements[lang]}</dd>
-          <dt>{ja ? '更新日' : 'Released'}</dt>
+          <dt>{ja ? '情報更新日' : 'Listing updated'}</dt>
           <dd>
             <time datetime={app.updated}>{app.updated}</time>
           </dd>
@@ -179,15 +183,21 @@ const ja = lang === 'ja';
             )}
           </div>
         ))}
-        <a class="external-link" href={app.sourceUrl} rel="noopener noreferrer">
-          {ja ? 'アプリのソースコード' : 'App source code'} ↗
-        </a>
+        {app.sourceUrl && (
+          <a
+            class="external-link"
+            href={app.sourceUrl}
+            rel="noopener noreferrer"
+          >
+            {ja ? 'アプリのソースコード' : 'App source code'} ↗
+          </a>
+        )}
         <a
           class="external-link"
           href={app.supportUrl}
           rel="noopener noreferrer"
         >
-          {ja ? 'GitHubでサポートを見る' : 'Support on GitHub'} ↗
+          {ja ? 'サポートを見る' : 'Get support'} ↗
         </a>
         <p class="fine-print">
           {ja

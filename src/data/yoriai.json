@@ -1,0 +1,66 @@
+{
+  "id": "yoriai",
+  "name": "yoriAI",
+  "status": "published",
+  "category": "utilities",
+  "summary": {
+    "ja": "今日の気分に合わせて、AIバーテンダーが一杯を提案。",
+    "en": "An AI bartender suggests a drink to match how you feel today."
+  },
+  "tagline": {
+    "ja": "今日の気分に、ひとつのレシピ。",
+    "en": "A recipe for how you feel today."
+  },
+  "description": {
+    "ja": "今日の気分を伝えると、AIバーテンダーがオリジナルのカクテルとレシピを提案します。Appleのヘルスケアと連携して、歩数や睡眠などのデータを提案に活用できます。",
+    "en": "Tell the AI bartender how you feel to get an original cocktail suggestion and recipe. Apple Health integration can use information such as steps and sleep to personalize suggestions."
+  },
+  "price": { "ja": "無料", "en": "Free" },
+  "requirements": {
+    "ja": "iPhone、iOS 13.0以降。App Storeの年齢区分は18+。",
+    "en": "iPhone with iOS 13.0 or later. Rated 18+ on the App Store."
+  },
+  "permissions": {
+    "ja": "Appleのヘルスケアと連携する場合、HealthKit経由で選んだ項目の読み取りを許可します。",
+    "en": "If you link Apple Health, grant read access through HealthKit for the data you choose to share."
+  },
+  "privacy": {
+    "ja": "App Storeでは、開発者はHealthKitから取得したデータをアプリ内の分析に使用し、外部へ送信しないと説明しています。詳しくはApp Storeの「アプリのプライバシー」を確認してください。",
+    "en": "On the App Store, the developer states that HealthKit data is analyzed in the app and is not sent externally. See App Privacy on the App Store for details."
+  },
+  "limitations": {
+    "ja": "カクテルやアルコールに関する表現を含みます。レシピの提案は娯楽向けです。",
+    "en": "The app contains references to cocktails and alcohol. Recipe suggestions are for entertainment."
+  },
+  "features": [
+    {
+      "ja": "気分に合わせたカクテルとレシピの提案",
+      "en": "Cocktail and recipe suggestions based on your mood"
+    },
+    {
+      "ja": "提案されたカクテルのコレクション",
+      "en": "A collection of suggested cocktails"
+    }
+  ],
+  "instructions": [
+    {
+      "ja": "App Storeからアプリを入手します。",
+      "en": "Get the app from the App Store."
+    },
+    {
+      "ja": "今日の気分を入力し、提案されたレシピを見ます。",
+      "en": "Enter how you feel today and explore the suggested recipe."
+    }
+  ],
+  "updated": "2026-11-17",
+  "supportUrl": "https://chlorinated-gatsby-142.notion.site/YoriAI-2f3d6edf2c7780189fbef94a355dc7dd",
+  "license": "App Store",
+  "distributions": [
+    {
+      "kind": "store",
+      "platform": "iPhone",
+      "store": "apple",
+      "url": "https://apps.apple.com/jp/app/yoriai/id6758237138"
+    }
+  ]
+}

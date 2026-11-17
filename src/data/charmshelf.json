@@ -1,0 +1,66 @@
+{
+  "id": "charmshelf",
+  "name": "CharmShelf",
+  "status": "published",
+  "category": "productivity",
+  "summary": {
+    "ja": "画像、動画、音声、PDFを、端末の中でひとまとめに。",
+    "en": "Organize images, videos, audio, and PDFs on your device."
+  },
+  "tagline": {
+    "ja": "集めたメディアに、自分だけの棚を。",
+    "en": "A shelf for the media you collect."
+  },
+  "description": {
+    "ja": "写真や動画、音声、PDFをカタログに整理するメディアライブラリです。公開中のAndroidプレビュー版 v1.0.12-oss.2 を試せます。",
+    "en": "Organize photos, videos, audio, and PDFs in a media library with catalogs. The public Android preview is v1.0.12-oss.2."
+  },
+  "price": { "ja": "無料・オープンソース", "en": "Free and open source" },
+  "requirements": {
+    "ja": "Android 7.0以降。GitHubから入手するAPK形式。",
+    "en": "Android 7.0 or later. Distributed as an APK on GitHub."
+  },
+  "permissions": {
+    "ja": "整理するファイルを端末の選択画面で指定します。公開APKにはカメラ、生体認証、通知などの機能に使う権限が含まれます。ストア外のAPKを入れるときは、Androidがインストール元ごとの許可を求めることがあります。",
+    "en": "Choose which files to import in the device picker. The public APK declares permissions for features such as the camera, biometrics, and notifications. When installing an APK outside a store, Android may require permission for the specific installer."
+  },
+  "privacy": {
+    "ja": "公開元は、取り込んだメディアを端末内で管理するアプリとして案内しています。画像・動画・音声・PDFは、選んだファイルだけを取り込んでください。",
+    "en": "The publisher describes CharmShelf as a local media library that manages imported files on your device. You choose which images, videos, audio files, and PDFs to import."
+  },
+  "limitations": {
+    "ja": "公開APKはエミュレーターでインストールと起動を確認済みです。このAPK自体の実機操作、バックアップ・復元、ファイル共有、背景音声は未確認です。TagShelfからの自動移行はありません。重要なファイルの原本とバックアップを残して試してください。",
+    "en": "The publisher checked installation and launch on an emulator. Physical-device operation, backup and restore, file sharing, and background audio have not been checked with this APK. TagShelf data does not migrate automatically. Keep your original files and backups when trying the preview."
+  },
+  "features": [
+    {
+      "ja": "画像、動画、音声、PDFをカタログで整理",
+      "en": "Organize images, videos, audio, and PDFs in catalogs"
+    },
+    {
+      "ja": "PDFを開いて文字選択やリンク操作",
+      "en": "Open PDFs, select text, and follow links"
+    }
+  ],
+  "instructions": [
+    {
+      "ja": "GitHubのプレビュー版ページで検証範囲と導入手順を確認します。",
+      "en": "Read the preview’s validation notes and setup instructions on GitHub."
+    },
+    {
+      "ja": "リリースページのAssetsから署名済みAPKと照合用のSHA-256を入手します。",
+      "en": "Get the signed APK and SHA-256 checksum from the release assets."
+    }
+  ],
+  "updated": "2026-11-17",
+  "sourceUrl": "https://github.com/TaigaShinohara/CharmShelf",
+  "supportUrl": "https://github.com/TaigaShinohara/CharmShelf/issues",
+  "license": "MIT",
+  "distributions": [
+    {
+      "kind": "github-preview",
+      "platform": "Android",
+      "url": "https://github.com/TaigaShinohara/CharmShelf/releases/tag/v1.0.12-oss.2"
+    }
+  ]
+}

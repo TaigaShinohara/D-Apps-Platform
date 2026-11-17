@@ -5,9 +5,9 @@ description: Small tools, thoughtfully made. A place to understand an app before
 
 ## A home for useful little apps
 
-D-Apps brings together independent apps that make everyday tasks a little easier. Read about features, compatibility, and data handling before choosing a download.
+D-Apps brings together independent apps that make everyday tasks a little easier. Read about features, compatibility, and data handling before getting started.
 
-Some apps are available directly from this site; others link to their official stores. Each button tells you where it leads.
+Buttons lead to a direct download, an official store, a web app, or a public preview on GitHub. Each button names its destination.
 
 ## Open by design
 
@@ -17,4 +17,4 @@ There are no accounts or ads, and we do not ask for personal information to brow
 
 ## Clear information, one app at a time
 
-We check distribution sources, supported platforms, signing and notarization records, and known limitations. We do not promise that software is risk-free. Read our [distribution and safety policy](/en/safety/).
+We check where apps are published, which platforms they support, and their known limitations. For files served directly by D-Apps, we also show verification details such as signing and notarization. Read our [distribution and safety policy](/en/safety/).

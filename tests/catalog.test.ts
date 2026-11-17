@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import oneclipData from '../src/data/oneclip.json';
 import { distributionLink } from '../src/lib/distribution';
 import {
   apps,
@@ -8,15 +9,26 @@ import {
   downloadPath,
 } from '../src/lib/catalog';
 
-test('published catalog has complete translations and a versioned direct release', () => {
-  assert.equal(apps.length, 1);
-  const item = apps[0].distributions[0];
-  assert.equal(item.kind, 'direct');
-  if (item.kind === 'direct')
-    assert.equal(
-      downloadPath(apps[0], item),
-      '/downloads/oneclip/1.0.1/OneClip-1.0.1.zip',
+const oneclip = appSchema.parse(oneclipData);
+const direct = oneclip.distributions[0];
+
+test('external catalog entries are published and the OneClip ZIP keeps its original path', () => {
+  for (const id of [
+    'profilemaker',
+    'yoriai',
+    'personal-color-check',
+    'charmshelf',
+  ]) {
+    assert.ok(
+      apps.some((app) => app.id === id),
+      id,
     );
+  }
+  assert.ok(direct.kind === 'direct');
+  assert.equal(
+    downloadPath(oneclip, direct),
+    '/downloads/oneclip/1.0.1/OneClip-1.0.1.zip',
+  );
 });
 test('incomplete translation, draft, path traversal and missing approval fail closed', () => {
   for (const change of [
@@ -24,12 +36,10 @@ test('incomplete translation, draft, path traversal and missing approval fail cl
     { status: 'draft' },
     { id: '../private' },
     {
-      distributions: [
-        { ...apps[0].distributions[0], verification: { status: 'pending' } },
-      ],
+      distributions: [{ ...direct, verification: { status: 'pending' } }],
     },
   ])
-    assert.equal(appSchema.safeParse({ ...apps[0], ...change }).success, false);
+    assert.equal(appSchema.safeParse({ ...oneclip, ...change }).success, false);
 });
 test('untrusted direct download sources, altered hashes and unsafe filenames are rejected', () => {
   for (const change of [
@@ -48,8 +58,7 @@ test('untrusted direct download sources, altered hashes and unsafe filenames are
     },
   ])
     assert.equal(
-      distributionSchema.safeParse({ ...apps[0].distributions[0], ...change })
-        .success,
+      distributionSchema.safeParse({ ...direct, ...change }).success,
       false,
     );
 });
@@ -106,4 +115,39 @@ test('store link presentation names its destination and does not trigger direct 
     distributionLink({ id: 'fixture' }, item, 'en').label,
     'View on App Store',
   );
+});
+
+test('external Web and preview links require authorized hosts and a pinned release tag', () => {
+  for (const [kind, platform, allowed, rejected] of [
+    [
+      'web',
+      'Web',
+      'https://taigashinohara.github.io/personal-color-check/',
+      [
+        'https://taigashinohara.github.io.example.org/personal-color-check/',
+        'https://taigashinohara.github.io/personal-color-check/?utm_source=site',
+      ],
+    ],
+    [
+      'github-preview',
+      'Android',
+      'https://github.com/TaigaShinohara/CharmShelf/releases/tag/v1.0.12-oss.2',
+      [
+        'https://github.com/Other/CharmShelf/releases/tag/v1.0.12-oss.2',
+        'https://github.com/TaigaShinohara/CharmShelf/releases/latest',
+        'https://github.com/TaigaShinohara/CharmShelf/releases/download/v1.0.12-oss.2/CharmShelf.apk',
+      ],
+    ],
+  ] as const) {
+    assert.ok(
+      distributionSchema.safeParse({ kind, platform, url: allowed }).success,
+    );
+    for (const url of rejected) {
+      assert.equal(
+        distributionSchema.safeParse({ kind, platform, url }).success,
+        false,
+        url,
+      );
+    }
+  }
 });
