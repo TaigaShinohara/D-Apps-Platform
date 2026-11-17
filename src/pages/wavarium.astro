@@ -1,0 +1,880 @@
+---
+import { Image } from 'astro:assets';
+import tankArtwork from '../assets/wavarium/tank.webp';
+import stageArtwork from '../assets/wavarium/stage.webp';
+import { wavariumCsp, wavariumIntegrity } from '../lib/security.mjs';
+import '../styles/wavarium.css';
+
+const canonical = new URL('/wavarium/', Astro.site);
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="text-scale" content="scale" />
+    <meta name="color-scheme" content="light dark" />
+    <meta http-equiv="Content-Security-Policy" content={wavariumCsp} />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="音楽集団 WAV/ARIUMのデビューに向けた制作の進み具合を記録する、パソパソのプロデュース日誌。"
+    />
+    <title>WAV/ARIUM — パソパソのプロデュース日誌</title>
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- ======= blog masthead ======= -->
+      <header class="mast">
+        <a class="skip-link" href="#content">
+          本文へ移動
+        </a>
+        <a class="catalog-link" href="/ja/">
+          ← D-Apps トップ
+        </a>
+        <div class="mast-meta">
+          <span>2026年11月17日（火）</span>
+          <span class="dot" aria-hidden="true"></span>
+          <span>プロデュース日誌</span>
+          <span class="dot" aria-hidden="true"></span>
+          <span>更新：パソパソ</span>
+        </div>
+        <p class="blogname">♪ PASOPASO PRODUCE BLOG</p>
+        <h1 id="content" tabindex="-1">
+          <span class="heading-part">水槽から、</span>
+          <span class="heading-part">
+            <span class="wave">デビュー</span>へ。
+          </span>
+          <br />
+          <span class="heading-part" lang="en">
+            WAV/ARIUM
+          </span>
+          <span class="heading-part">プロジェクト</span>
+        </h1>
+        <p class="lede">
+          音楽集団
+          <strong>WAV/ARIUM（わゔありうむ）</strong>
+          のアーティストデビューまでを、プロデューサー役のパソパソがブログ形式で記録するページです。決まったこと、いま動いていること、待ちの理由——ぜんぶここに並べました。ゴールは、水槽の外。配信の海です。
+        </p>
+        <figure class="hero-figure">
+          <div class="hero">
+            <Image
+              src={tankArtwork}
+              alt="夜の制作デスクに置かれた水槽。音符やレコードが魚のように泳いでいるイラスト"
+              widths={[480, 768, 1080, 1440, 1920]}
+              sizes="(max-width: 1080px) calc(100vw - 36px), 1044px"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+          <figcaption class="hero-cap">
+            <b>今夜の水槽。</b>
+            曲たちはもう泳いでいる。あとは海に出す段取りだけ。
+          </figcaption>
+        </figure>
+      </header>
+
+      <div class="layout">
+        <main>
+          <!-- ======= 1. water meter ======= -->
+          <section class="meter-section" aria-labelledby="h-meter">
+            <div class="sec-head">
+              <span class="no" aria-hidden="true">
+                1
+              </span>
+              <h2 id="h-meter">デビューまでの水位</h2>
+            </div>
+            <div class="meter">
+              <div class="meter-top">
+                <span class="big">
+                  6 <small>/ 16 タスク完了</small>
+                </span>
+                <span class="stamp now">いまは「曲を整える」フェーズ</span>
+              </div>
+              <div
+                class="tank"
+                role="img"
+                aria-label="進捗 16タスク中6つ完了、約38パーセント"
+              >
+                <div class="tank-fill" id="tankFill"></div>
+              </div>
+              <div class="meter-nums">
+                <div class="chipstat">
+                  <b>6</b>
+                  <span>済んだ</span>
+                </div>
+                <div class="chipstat">
+                  <b>4</b>
+                  <span>進行中</span>
+                </div>
+                <div class="chipstat">
+                  <b>6</b>
+                  <span>待ち・保留</span>
+                </div>
+                <div class="chipstat">
+                  <b>★</b>
+                  <span>ゴールは別枠</span>
+                </div>
+              </div>
+              <p class="meter-note">
+                土台づくりはほぼ終わりました。残りは「曲を仕上げる →
+                Proを更新する → MVで広げる →
+                配信登録」の4ステップ。焦らず、でも止まらずにいきます。
+              </p>
+            </div>
+          </section>
+
+          <!-- ======= 2. roadmap ======= -->
+          <section aria-labelledby="h-road">
+            <div class="sec-head">
+              <span class="no" aria-hidden="true">
+                2
+              </span>
+              <h2 id="h-road">デビューまでのロードマップ</h2>
+            </div>
+            <p class="sec-sub">
+              カード下の案内を開くと、止まっている理由や再開手順を確認できます。
+            </p>
+            <div
+              class="filters"
+              role="group"
+              aria-label="状態で絞り込み"
+              hidden
+            >
+              <button type="button" data-filter="all" aria-pressed="true">
+                すべて
+              </button>
+              <button type="button" data-filter="done" aria-pressed="false">
+                済んだ
+              </button>
+              <button type="button" data-filter="now" aria-pressed="false">
+                いま進行中
+              </button>
+              <button type="button" data-filter="wait" aria-pressed="false">
+                待ち・保留
+              </button>
+            </div>
+
+            <ol class="road" id="road">
+              <li class="phase" data-status="done">
+                <span class="phase-dot" aria-hidden="true">
+                  ✓
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp done">済</span>
+                      <span class="who">STEP 1 ・ 旗を立てる</span>
+                    </div>
+                    <h3>集団の名前と顔ぶれが決まった</h3>
+                    <p>
+                      supercell型の音楽集団として出発。名前は読みやすさ重視で「わゔありうむ」と読める表記に。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark ok">✓</span>
+                        <span>
+                          集団名 <b>WAV/ARIUM</b> で確定
+                          <small>
+                            wav +
+                            aquarium（水槽）。ジャケットの真ん中に置ける字面。
+                          </small>
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark ok">✓</span>
+                        <span>
+                          所属 <b>13組</b> のラインナップ確定
+                          <small>
+                            水槽に放流するつもりで数を出し、そこから絞ってこの13組に。
+                          </small>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li class="phase" data-status="done">
+                <span class="phase-dot" aria-hidden="true">
+                  ✓
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp done">済</span>
+                      <span class="who">STEP 2 ・ デビュー曲</span>
+                    </div>
+                    <h3>デビューの顔が決まった</h3>
+                    <p>
+                      先陣を切るのは、主宰が自分で足した名前のユニット。歌詞も主宰の手書きです。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark ok">✓</span>
+                        <span>
+                          デビューユニットは <b>再帰的自己改善</b>
+                          <small>AIと作る集団の旗印になるユニット。</small>
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark ok">✓</span>
+                        <span>
+                          <b>デビュー曲が決定</b>
+                          <small>
+                            ボイスメモの歌声から生まれた1曲。この曲でデビューします。
+                          </small>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li class="phase" data-status="done">
+                <span class="phase-dot" aria-hidden="true">
+                  ✓
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp done">済</span>
+                      <span class="who">STEP 3 ・ 配信の作戦</span>
+                    </div>
+                    <h3>配信先は DistroKid に決定</h3>
+                    <p>
+                      「AIが認められている中で一番安く、レーベル名（看板）も付けられる」が決め手でした。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark ok">✓</span>
+                        <span>
+                          配信先は
+                          <b>DistroKid / Musician Plus</b> プラン
+                          <small>看板つき・最安の条件を全部満たす1社。</small>
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark ok">✓</span>
+                        <span>
+                          アカウントの<b>準備まで完了</b>
+                          <small>
+                            登録メール設定とパスワードの保管まで済み。支払いの手前で止めてあります。
+                          </small>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <details>
+                    <summary class="phase-toggle">
+                      くわしく{' '}
+                      <span class="chev" aria-hidden="true">
+                        ▾
+                      </span>
+                    </summary>
+                    <div class="phase-detail">
+                      <div class="memo">
+                        <b>なぜ支払いがまだなの？</b>
+                        <br />
+                        作戦変更があったためです。先に YouTube で MV
+                        を出して認知を広げ、伸びてきたタイミングで各種サブスク配信を始めることにしました。支払いと配信登録は、その合図が来てから再開します。
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </li>
+
+              <li class="phase" data-status="now">
+                <span class="phase-dot" aria-hidden="true">
+                  ●
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp now">いまここ</span>
+                      <span class="who">STEP 4 ・ 曲を整える</span>
+                      <span class="who">選別：主宰担当</span>
+                    </div>
+                    <h3>曲の選別と、気になる部分の調整</h3>
+                    <p>
+                      ダウンロードする曲の選別は主宰が自分でやると決めました。あわせて「読み方が変」「途中で終わってる」曲の直し方も整理済みです（下の直し方メモへ）。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark doing">…</span>
+                        <span>
+                          ダウンロード曲の<b>選別</b>
+                          <small>
+                            主宰が自分の耳で選んでいる最中。パソパソは口を出しません。
+                          </small>
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark doing">…</span>
+                        <span>
+                          気になる曲の<b>調整</b>（読み方・途中終了・部分修正）
+                          <small>
+                            直し方は3パターンに整理済み。実際の修正作業は Suno
+                            の Pro 機能を使う場面が多いです。
+                          </small>
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark doing">…</span>
+                        <span>
+                          <b>WAV版の確保</b>
+                          <small>
+                            主宰担当。商用利用の対象は「有料プランの間にダウンロードした曲」なので、落とすタイミングが大事な作業です。
+                          </small>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li class="phase" data-status="wait">
+                <span class="phase-dot" aria-hidden="true">
+                  ◐
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp wait">待ち</span>
+                      <span class="who">STEP 5 ・ 声を残す</span>
+                      <span class="who">再開手順メモあり</span>
+                    </div>
+                    <h3>Persona「再帰 Core」を作る</h3>
+                    <p>
+                      再帰的自己改善の「声」を Suno の Persona
+                      として保存し、曲ごとに使い回せるようにする作業。サインインの本人確認で止まったまま、ひと休み中です。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark todo">・</span>
+                        <span>
+                          Persona <b>「再帰 Core」</b> の作成
+                          <small>元になる曲は「昨日の僕がハモってる」。</small>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <details>
+                    <summary class="phase-toggle">
+                      再開手順をみる
+                      <span class="chev" aria-hidden="true">
+                        ▾
+                      </span>
+                    </summary>
+                    <div class="phase-detail">
+                      <p class="memo-lead">
+                        止まった場所：Suno へのサインイン（Google
+                        の2段階認証の確認待ち）。再開するときはこの順番です。
+                      </p>
+                      <ol>
+                        <li>
+                          Suno に Google 経由でサインイン（主宰のアカウント）
+                        </li>
+                        <li>
+                          ライブラリに「昨日の僕がハモってる」があるか確認
+                        </li>
+                        <li>あれば、その曲から Persona「再帰 Core」を作成</li>
+                      </ol>
+                      <div class="memo">
+                        急ぎではありません。<b>Pro を更新したあと</b>
+                        にまとめてやるのが効率的です。
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </li>
+
+              <li class="phase" data-status="wait">
+                <span class="phase-dot" aria-hidden="true">
+                  ◐
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp wait">待ち</span>
+                      <span class="who">STEP 6 ・ Suno Pro</span>
+                      <span class="who">11/24・11/27 チェック予定</span>
+                    </div>
+                    <h3>Suno Pro を、ブラックフライデーで安く更新</h3>
+                    <p>
+                      Pro
+                      に戻すこと自体は決定済み。いちばん安く契約するために、セール開始を待っています。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark todo">・</span>
+                        <span>
+                          <b>11/24</b> セール開始チェック
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark todo">・</span>
+                        <span>
+                          <b>11/27</b> ブラックフライデー当日に契約判断
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <details>
+                    <summary class="phase-toggle">
+                      価格メモをみる
+                      <span class="chev" aria-hidden="true">
+                        ▾
+                      </span>
+                    </summary>
+                    <div class="phase-detail">
+                      <ul>
+                        <li>
+                          通常価格：月額 $10 ／ 年額 $96（月あたり
+                          $8、年額が20%お得）
+                        </li>
+                        <li>プロモコードや学割は確認できず</li>
+                        <li>
+                          昨年のブラックフライデーは年額40%オフだった実績あり
+                        </li>
+                      </ul>
+                      <div class="memo">
+                        Pro が必要な理由：曲の部分修正（Replace
+                        Section）などの調整機能と、商用利用できるダウンロードのためです。なお前の
+                        Pro は 11/15 で期限を迎えました。
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </li>
+
+              <li class="phase" data-status="now">
+                <span class="phase-dot" aria-hidden="true">
+                  ●
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp now">進行中</span>
+                      <span class="who">STEP 7 ・ MV</span>
+                      <span class="who">別チャットで制作</span>
+                    </div>
+                    <h3>YouTube で MV を出して、知ってもらう</h3>
+                    <p>
+                      配信の前に、まず YouTube で見つけてもらう作戦。MV
+                      制作は専用チャットで進んでいます。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark doing">…</span>
+                        <span>
+                          動画生成は <b>Google Colab</b>、つなぎは <b>Flow</b>
+                          <small>いまの主宰の制作スタックそのまま。</small>
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark todo">・</span>
+                        <span>
+                          MV が伸びてきたら、配信登録へ合図
+                          <small>
+                            この合図が DistroKid
+                            の支払い再開のトリガーになります。
+                          </small>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li class="phase" data-status="wait">
+                <span class="phase-dot" aria-hidden="true">
+                  ◐
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp hold">保留</span>
+                      <span class="who">STEP 8 ・ 配信登録</span>
+                      <span class="who">合図待ち</span>
+                    </div>
+                    <h3>DistroKid の支払いと、楽曲の配信登録</h3>
+                    <p>
+                      準備は支払いの手前まで終わっています。MV
+                      の伸びを見てから、主宰の合図で一気に進めます。
+                    </p>
+                    <ul class="tasklist">
+                      <li>
+                        <span class="mark todo">・</span>
+                        <span>
+                          Musician Plus の<b>支払い確定</b>
+                          （主宰の明示OKが必要）
+                        </span>
+                      </li>
+                      <li>
+                        <span class="mark todo">・</span>
+                        <span>
+                          デビュー曲の<b>アップロードと配信申請</b>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+
+              <li class="phase" data-status="wait">
+                <span class="phase-dot" aria-hidden="true">
+                  ★
+                </span>
+                <div class="phase-card">
+                  <div class="phase-main">
+                    <div class="phase-kicker">
+                      <span class="stamp wait">ゴール</span>
+                      <span class="who">STEP 9 ・ DEBUT</span>
+                    </div>
+                    <h3>アーティストデビュー！</h3>
+                    <p>
+                      再帰的自己改善のデビュー曲が、Spotify や Apple Music
+                      など各種サブスクに並ぶ日。水槽の外の海へ。
+                    </p>
+                  </div>
+                </div>
+              </li>
+            </ol>
+            <p class="filter-status" id="filterStatus" role="status"></p>
+          </section>
+
+          <!-- ======= 3. fix-it notes ======= -->
+          <section aria-labelledby="h-fix">
+            <div class="sec-head">
+              <span class="no" aria-hidden="true">
+                3
+              </span>
+              <h2 id="h-fix">曲の直し方メモ</h2>
+            </div>
+            <p class="sec-sub">
+              「あと調整したい曲がいくつかある」への、パソパソの回答まとめ。症状ごとに直し方は3つだけです。
+            </p>
+            <div class="fixgrid">
+              <article class="fix">
+                <div class="sym" aria-hidden="true">
+                  🗣️
+                </div>
+                <h3>読み方が変</h3>
+                <span class="tool">歌詞の直し</span>
+                <p>
+                  読みが複数ある漢字を、Suno
+                  が違う読みで歌ってしまうのが原因のことがほとんどです。
+                </p>
+                <ol>
+                  <li>
+                    間違えた漢字を <b>ひらがなに開く</b>（一番確実な定番）
+                  </li>
+                  <li>送り仮名や区切りを足して、読みを誘導する</li>
+                  <li>直した歌詞で再生成して聴き比べる</li>
+                </ol>
+              </article>
+              <article class="fix">
+                <div class="sym" aria-hidden="true">
+                  ✂️
+                </div>
+                <h3>途中で終わってる</h3>
+                <span class="tool">Extend（延長）</span>
+                <p>
+                  曲の続きを生成してつなぐ方法です。始める位置にコツがあります。
+                </p>
+                <ol>
+                  <li>
+                    Extend は <b>途切れる瞬間ではなく、少し手前から</b> 始める
+                  </li>
+                  <li>終わり方のイメージ（フェードアウト等）を指示に添える</li>
+                  <li>つなぎ目を聴いて、気になれば位置をずらして再挑戦</li>
+                </ol>
+              </article>
+              <article class="fix">
+                <div class="sym" aria-hidden="true">
+                  🩹
+                </div>
+                <h3>一部分だけ直したい</h3>
+                <span class="tool">Replace Section ※Pro系機能</span>
+                <p>
+                  曲全体を作り直さず、気になる区間だけを差し替える方法です。
+                </p>
+                <ol>
+                  <li>
+                    直したい <b>区間を選ぶ</b>
+                  </li>
+                  <li>その部分の歌詞・指示を直して再生成</li>
+                  <li>前後のつながりを聴いて確認する</li>
+                </ol>
+              </article>
+            </div>
+          </section>
+
+          <!-- ======= 4. residents ======= -->
+          <section aria-labelledby="h-units">
+            <div class="sec-head">
+              <span class="no" aria-hidden="true">
+                4
+              </span>
+              <h2 id="h-units">水槽の住人たち（13組）</h2>
+            </div>
+            <p class="sec-sub">
+              WAV/ARIUM
+              所属アーティスト。曲ごとに顔を使い分けるのが、この集団の強みです。
+            </p>
+            <div class="residents">
+              <div class="unit debut">
+                <span class="crown">★ デビュー</span>
+                <div class="fish" aria-hidden="true">
+                  🐠
+                </div>
+                <b>再帰的自己改善</b>
+                <span>先陣・旗印ユニット</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐟
+                </div>
+                <b>404号室</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐟
+                </div>
+                <b>スイソースキー</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐡
+                </div>
+                <b>深海書店</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐟
+                </div>
+                <b>ホテルニュー水槽</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🦑
+                </div>
+                <b>月曜は潜る</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐟
+                </div>
+                <b>NEON RIVER CLUB</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐙
+                </div>
+                <b>Submerged Piano</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐟
+                </div>
+                <b>GlaasSignal</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐧
+                </div>
+                <b>PenguinTape</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐟
+                </div>
+                <b>wav.kid</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🌙
+                </div>
+                <b>Yoru Parlor</b>
+                <span>所属</span>
+              </div>
+              <div class="unit">
+                <div class="fish" aria-hidden="true">
+                  🐳
+                </div>
+                <b>BIGRIVER</b>
+                <span>所属</span>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <!-- ======= sidebar ======= -->
+        <aside class="side">
+          <div class="side-card" aria-labelledby="h-bf">
+            <h2 id="h-bf">⏰ ブラックフライデーまで</h2>
+            <p class="count-num">
+              <time id="bfCountdown" datetime="2026-11-27">
+                11月27日（金）
+              </time>
+            </p>
+            <p>
+              <span class="date-line">11/24（火）</span>
+              セール開始チェック
+              <br />
+              <span class="date-line">11/27（金）</span>
+              当日に最終チェック → 契約判断
+            </p>
+            <p class="soft-text">
+              通常は年額
+              $96。昨年は年額40%オフでした。今年も来るか、パソパソが見張ります。
+            </p>
+          </div>
+
+          <div class="side-card" aria-labelledby="h-next">
+            <h2 id="h-next">🎧 次のアクション</h2>
+            <ol class="next-list">
+              <li>
+                <span>
+                  <b>曲の選別を終える</b>
+                  <small>主宰の耳が基準。終わったら教えてください</small>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <b>11/24・11/27 にセールをチェック</b>
+                  <small>パソパソが見張り中。その結果で Pro 契約へ</small>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <b>Pro で曲を調整して WAV 確定</b>
+                  <small>読み直し・Extend・Replace Section を使う場面</small>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <b>Persona「再帰 Core」を再開</b>
+                  <small>サインインから。手順メモはロードマップ内</small>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <b>MV の伸びを見て配信登録</b>
+                  <small>合図が来たら DistroKid の支払いから再開</small>
+                </span>
+              </li>
+            </ol>
+          </div>
+
+          <div class="side-card" aria-labelledby="h-div">
+            <h2 id="h-div">🤝 担当分担</h2>
+            <div class="divide">
+              <div class="person taiga">
+                <b>主宰（アーティスト）</b>
+                <ul>
+                  <li>曲の選別・最終判断</li>
+                  <li>WAV版の確保</li>
+                  <li>MV制作（別チャット）</li>
+                  <li>支払いの最終OK</li>
+                </ul>
+              </div>
+              <div class="person paso">
+                <b>パソパソ（プロデューサー）</b>
+                <ul>
+                  <li>段取りの管理と記録</li>
+                  <li>セール・期限の見張り</li>
+                  <li>直し方や手順の整理</li>
+                  <li>登録作業の伴走</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-card diary" aria-labelledby="h-diary">
+            <h2 id="h-diary">📓 プロデューサー日誌</h2>
+            <article>
+              <time>EP.1 ― 名前が決まった夜</time>
+              <h3>水槽に名前がついた</h3>
+              <p>
+                「わゔありうむ」と読めることが決め手に。名前案を大量に出して絞る作業は、放流みたいで楽しかった。
+              </p>
+            </article>
+            <article>
+              <time>EP.2 ― 13組とデビュー</time>
+              <h3>主宰が自分で足した名前が旗印に</h3>
+              <p>
+                「再帰的自己改善」は主宰の発案。そのままデビューユニットになり、デビュー曲まで決まった伝説の夜。
+              </p>
+            </article>
+            <article>
+              <time>EP.3 ― 作戦会議</time>
+              <h3>配信は急がない、と決めた</h3>
+              <p>
+                DistroKid の準備は支払い手前まで完了。でも先に MV
+                で知ってもらう作戦に変更。順番を入れ替えただけ、ゴールは同じ。
+              </p>
+            </article>
+            <article>
+              <time>EP.4 ― いま</time>
+              <h3>選別はアーティストの仕事</h3>
+              <p>
+                「選別は自分でやる」——その一言が一番プロデューサー冥利でした。パソパソは段取りと見張りに徹します。
+              </p>
+            </article>
+          </div>
+        </aside>
+      </div>
+
+      <!-- ======= goal ======= -->
+      <section class="goal" aria-labelledby="h-goal">
+        <Image
+          src={stageArtwork}
+          alt="水の中に用意された小さなステージ。マイクとギターに光が差しているイラスト"
+          widths={[480, 768, 1080, 1440, 1920]}
+          sizes="(max-width: 1080px) calc(100vw - 36px), 1044px"
+          loading="lazy"
+        />
+        <div class="goal-body">
+          <h2 id="h-goal">ゴールは、このステージの先。</h2>
+          <p>
+            再帰的自己改善のデビュー曲が各種サブスクに並んだら、この水槽は「海デビュー」です。その日まで、このページに記録を足していきます。
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          <span class="sig">♪ パソパソ</span> ― WAV/ARIUM プロデュース担当
+          <br />
+          2026年11月17日時点の記録です。進んだら、またここに書き足します。
+        </p>
+        <nav aria-label="サイト情報">
+          <a href="/ja/">D-Apps トップ</a>
+          <a href="/ja/privacy/">プライバシー</a>
+          <a href="/ja/license/">ライセンス</a>
+        </nav>
+      </footer>
+    </div>
+    <script
+      is:inline
+      src="/scripts/wavarium.js"
+      integrity={wavariumIntegrity}
+      defer
+    ></script>
+  </body>
+</html>

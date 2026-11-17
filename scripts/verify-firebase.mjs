@@ -1,29 +1,17 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { server as superstatic } from 'superstatic';
-import { sha256, prepareHosting } from './prepare-hosting.mjs';
-import { securityHeaders } from '../src/lib/security.mjs';
+import { sha256 } from './prepare-hosting.mjs';
+import { startFirebasePreview } from './firebase-preview.mjs';
+import {
+  securityHeaders,
+  wavariumCspHeader,
+  wavariumPagePaths,
+} from '../src/lib/security.mjs';
 
-await prepareHosting();
-const { hosting } = JSON.parse(
-  await readFile('firebase.generated.json', 'utf8'),
-);
-const server = superstatic({
-  config: hosting,
-  port: 0,
-  hostname: '127.0.0.1',
-  debug: false,
-  compression: true,
-  stack: 'strict',
-}).listen();
-await new Promise((resolve, reject) => {
-  server.once('listening', resolve);
-  server.once('error', reject);
-});
+const { baseURL, close } = await startFirebasePreview();
 try {
-  const base = `http://127.0.0.1:${server.address().port}`;
   const get = (path, options = {}) =>
-    fetch(base + path, { redirect: 'manual', ...options });
+    fetch(baseURL + path, { redirect: 'manual', ...options });
   const root = await get('/');
   assert.equal(root.status, 302);
   assert.equal(root.headers.get('location'), '/ja/');
@@ -35,6 +23,7 @@ try {
     '/en/',
     '/ja/privacy/',
     '/en/privacy/',
+    ...wavariumPagePaths,
     '/missing-file.zip',
   ]) {
     const response = await get(path);
@@ -43,7 +32,13 @@ try {
       path === '/missing-file.zip' ? 404 : 200,
       path,
     );
-    for (const [name, value] of Object.entries(securityHeaders))
+    const expectedHeaders = {
+      ...securityHeaders,
+      ...(wavariumPagePaths.includes(path) && {
+        'content-security-policy': wavariumCspHeader,
+      }),
+    };
+    for (const [name, value] of Object.entries(expectedHeaders))
       assert.equal(response.headers.get(name), value, `${path} ${name}`);
     assert.equal(response.headers.get('set-cookie'), null);
     const body = await response.text();
@@ -99,7 +94,5 @@ try {
     'Firebase static engine: bilingual privacy, headers/404, redirects, downloads, HEAD and unapproved files verified.',
   );
 } finally {
-  await new Promise((resolve, reject) =>
-    server.close((error) => (error ? reject(error) : resolve())),
-  );
+  await close();
 }

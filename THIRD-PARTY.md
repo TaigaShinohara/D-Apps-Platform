@@ -14,6 +14,19 @@ The site-specific code, layout, and D-Apps mark are MIT licensed under `LICENSE`
 
 The icon and overview were copied from OneClip source commit `5d4cbcae` on 2026-11-16. Repository source is used for documentation and media provenance; binary integrity is independently pinned by SHA-256. Third-party names and store names identify their respective services and do not imply endorsement.
 
+## WAV/ARIUM fonts
+
+WAV/ARIUM uses same-origin WOFF2 subsets of [Zen Kaku Gothic New](https://github.com/google/fonts/tree/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/zenkakugothicnew) and [Zen Maru Gothic](https://github.com/google/fonts/tree/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/zenmarugothic). Their SIL Open Font License 1.1 notices ship in `public/licenses/` and are linked from the site's license pages.
+
+When updating the diary, new characters fall back to the visitor's system fonts. To refresh the subsets with the upstream TTF files, combine `src/pages/wavarium.astro` and `public/scripts/wavarium.js` into a text file, then use FontTools with Brotli support. Run the following for the Kaku Regular, Bold and Black weights and the Maru Bold and Black weights, substituting each source and destination filename.
+
+```sh
+cat src/pages/wavarium.astro public/scripts/wavarium.js > /tmp/wavarium-font-text.txt
+pyftsubset SOURCE.ttf --text-file=/tmp/wavarium-font-text.txt --flavor=woff2 \
+  --layout-features='*' --name-IDs='*' --name-languages='*' \
+  --output-file=src/assets/wavarium/SOURCE.woff2
+```
+
 ## App detail artwork
 
 Source images live in `src/assets/app-art/`. D-Apps serves optimized copies from its own host. Images are examples, as indicated in the detail-page captions.

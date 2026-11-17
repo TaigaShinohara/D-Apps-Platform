@@ -13,6 +13,10 @@ OneClip code, app icons, and feature illustrations originate from the [OneClip r
 
 Additional apps and brand materials retain the rights stated on their detail pages and by their publishers. Publishing this website’s code does not grant unrestricted rights to every app or trademark.
 
+## Fonts
+
+WAV/ARIUM serves [Zen Kaku Gothic New](/licenses/ZenKakuGothicNew-OFL.txt) and [Zen Maru Gothic](/licenses/ZenMaruGothic-OFL.txt) under the SIL Open Font License 1.1.
+
 ## Technical guidance
 
 Design and implementation reference [Google’s Modern Web Guidance](https://developer.chrome.com/docs/modern-web-guidance). This does not imply that Google or any app store operates or endorses D-Apps.

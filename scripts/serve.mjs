@@ -1,7 +1,11 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
-import { securityHeaders } from '../src/lib/security.mjs';
+import {
+  securityHeaders,
+  wavariumCspHeader,
+  wavariumPagePaths,
+} from '../src/lib/security.mjs';
 const manifest = JSON.parse(
   await readFile('infra/generated/manifest.json', 'utf8'),
 );
@@ -12,6 +16,7 @@ const mime = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
   '.xml': 'application/xml',
   '.txt': 'text/plain',
   '.zip': 'application/zip',
@@ -21,6 +26,8 @@ createServer(async (req, res) => {
     res.setHeader(key, value);
   res.setHeader('Cache-Control', 'no-store');
   const pathname = new URL(req.url, 'http://localhost').pathname;
+  if (wavariumPagePaths.includes(pathname))
+    res.setHeader('Content-Security-Policy', wavariumCspHeader);
   if (!['GET', 'HEAD'].includes(req.method)) {
     res.writeHead(405);
     res.end();

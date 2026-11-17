@@ -169,7 +169,8 @@
   }
   .header-links {
     display: flex;
-    gap: 2rem;
+    flex-wrap: wrap;
+    column-gap: 2rem;
     margin-inline-start: auto;
     font-size: 0.86rem;
   }
@@ -824,7 +825,7 @@
     .header-links {
       order: 3;
       width: 100%;
-      gap: 22px;
+      column-gap: 22px;
       margin-top: -12px;
       font-size: 0.8rem;
     }
