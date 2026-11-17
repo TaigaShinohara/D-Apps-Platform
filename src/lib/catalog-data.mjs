@@ -28,10 +28,10 @@ export function withoutRevoked(catalog, revoked) {
     }))
     .filter((app) => app.distributions.length > 0);
 }
-export function readCatalog() {
+export function readCatalog({ includeRevoked = false } = {}) {
   const catalog = readdirSync('src/data')
     .filter((name) => name.endsWith('.json'))
     .sort()
     .map((name) => JSON.parse(readFileSync(`src/data/${name}`, 'utf8')));
-  return withoutRevoked(catalog, readRevocations());
+  return includeRevoked ? catalog : withoutRevoked(catalog, readRevocations());
 }

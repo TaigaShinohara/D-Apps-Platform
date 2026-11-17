@@ -2,7 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import DownloadLink from '../../../components/DownloadLink.astro';
 import {
-  apps,
+  appDetails,
   locales,
   categories,
   type App,
@@ -12,7 +12,7 @@ import { Image } from 'astro:assets';
 import overview from '../../../assets/oneclip-overview.png';
 export function getStaticPaths() {
   return locales.flatMap((lang) =>
-    apps.map((app) => ({ params: { lang, id: app.id }, props: { app } })),
+    appDetails.map((app) => ({ params: { lang, id: app.id }, props: { app } })),
   );
 }
 const { app } = Astro.props as { app: App };
@@ -51,6 +51,13 @@ const ja = lang === 'ja';
         <p class="app-tagline">{app.tagline[lang]}</p>
       </div>
     </section>
+    {app.distributions.length === 0 && (
+      <p>
+        {ja
+          ? '現在、このアプリの配布を停止しています。'
+          : 'Distribution of this app is currently stopped.'}
+      </p>
+    )}
     <div class="detail-columns">
       <div class="detail-content">
         <p class="lead">{app.description[lang]}</p>

@@ -2,8 +2,10 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { apps } from '../../src/lib/catalog';
+import { apps, appDetails } from '../../src/lib/catalog';
+import { readRevocations } from '../../src/lib/catalog-data.mjs';
 import { scriptIntegrity, securityHeaders } from '../../src/lib/security.mjs';
+const oneclipAvailable = apps.some((app) => app.id === 'oneclip');
 
 for (const lang of ['ja', 'en']) {
   test(`${lang}: discover, switch language, verify download and privacy`, async ({
@@ -11,6 +13,7 @@ for (const lang of ['ja', 'en']) {
     context,
     request,
   }) => {
+    test.skip(!oneclipAvailable, 'OneClip distribution is currently stopped');
     const external: string[] = [];
     const errors: string[] = [];
     page.on('request', (req) => {
@@ -58,7 +61,7 @@ for (const lang of ['ja', 'en']) {
   }) => {
     for (const path of [
       `/${lang}/`,
-      `/${lang}/apps/oneclip/`,
+      ...appDetails.map((app) => `/${lang}/apps/${app.id}/`),
       `/${lang}/privacy/`,
     ]) {
       await page.goto(path);
@@ -68,7 +71,7 @@ for (const lang of ['ja', 'en']) {
       expect(result.violations).toEqual([]);
     }
     await page.setViewportSize({ width: 320, height: 720 });
-    await page.goto(`/${lang}/apps/oneclip/`);
+    await page.goto(oneclipAvailable ? `/${lang}/apps/oneclip/` : `/${lang}/`);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -83,7 +86,8 @@ for (const lang of ['ja', 'en']) {
         () => document.documentElement.scrollWidth <= window.innerWidth,
       ),
     ).toBe(true);
-    await expect(page.locator('a[download]')).toBeVisible();
+    if (oneclipAvailable)
+      await expect(page.locator('a[download]')).toBeVisible();
     // A wider fallback font reproduces the Linux reflow regression on macOS too.
     await page.evaluate(() => {
       document.documentElement.style.fontFamily = 'Verdana, sans-serif';
@@ -98,6 +102,7 @@ for (const lang of ['ja', 'en']) {
 test('critical navigation and download work without JavaScript', async ({
   browser,
 }) => {
+  test.skip(!oneclipAvailable, 'OneClip distribution is currently stopped');
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4321/ja/');
@@ -154,7 +159,27 @@ test('filter behavior supports six apps without network or persistence', async (
   await page.getByRole('combobox', { name: 'Platform' }).selectOption('macOS');
   await expect(page.locator('[data-app-card]:visible')).toHaveCount(2);
   await expect(page.getByRole('status')).toHaveText('2 apps');
-  expect(apps.length).toBe(1);
+});
+test('revoked URLs cannot be downloaded or linked from public app pages', async ({
+  page,
+  request,
+}) => {
+  const revoked = readRevocations();
+  for (const path of revoked) {
+    expect((await request.get(path)).status()).toBe(404);
+    expect((await request.head(path)).status()).toBe(404);
+  }
+  for (const lang of ['ja', 'en'])
+    for (const path of [
+      `/${lang}/`,
+      ...appDetails.map((app) => `/${lang}/apps/${app.id}/`),
+    ]) {
+      await page.goto(path);
+      const targets = await page
+        .locator('a[download]')
+        .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+      expect(targets.some((target) => revoked.includes(target))).toBe(false);
+    }
 });
 test('direct release bytes available for deterministic download test', async () => {
   expect((await readFile('.artifacts/releases/OneClip-1.0.1.zip')).length).toBe(
