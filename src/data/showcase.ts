@@ -226,6 +226,20 @@ export const projects: readonly ProjectEntry[] = [
       en: 'A social app where friends tagged their impressions of one another to build profiles.',
     },
   },
+  {
+    id: 'hyper-capslock',
+    name: 'ハイパーCapsLock',
+    detail: {
+      ja: 'スターター8点（Hyper+CでAIチャット、Hyper+Enterで送信、Hyper+1/2/3で固定席の切替、Hyper+Q/Wでウィンドウ左右、Hyper+Tでターミナル、Hyper+Spaceでランチャー、Hyper+Vでクリップボード履歴）を、macOSはKarabiner-Elements設定、WindowsはKanata設定とAutoHotkey v2スクリプトで提供します。',
+      en: 'Provides the eight starter bindings (Hyper+C for AI chat, Hyper+Enter to send, Hyper+1/2/3 for pinned seats, Hyper+Q/W for window left/right, Hyper+T for the terminal, Hyper+Space for the launcher, Hyper+V for clipboard history) as a Karabiner-Elements config on macOS and Kanata plus AutoHotkey v2 scripts on Windows.',
+    },
+    platform: 'macOS / Windows',
+    repository: 'hyper-capslock',
+    summary: {
+      ja: 'CapsLockを、AI開発のコックピットに。単押し=Esc、長押し=Hyper（Ctrl+Alt+Shift+Cmd/Win）。バイブコーディング特化のキー配置。',
+      en: 'Turn CapsLock into an AI-development cockpit: tap for Esc, hold for Hyper (Ctrl+Alt+Shift+Cmd/Win). A vibe-coding keymap for macOS (Karabiner) and Windows (Kanata + AutoHotkey).',
+    },
+  },
 ];
 
 export const skills: readonly ShowcaseEntry[] = [

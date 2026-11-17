@@ -298,8 +298,9 @@ test('the homepage distinguishes development projects and public skills from app
       'mori',
       'Hoshizora Watch',
       'Deeple',
+      'ハイパーCapsLock',
     ]);
-    await expect(projects.getByRole('link')).toHaveCount(21);
+    await expect(projects.getByRole('link')).toHaveCount(23);
     for (const project of showcasedProjects) {
       const route = `/${lang}/projects/${project.id}/`;
       await expect(
@@ -319,6 +320,7 @@ test('the homepage distinguishes development projects and public skills from app
       'Scriptlet',
       'kikkake',
       'face-mbti',
+      'hyper-capslock',
     ]) {
       await expect(
         projects.locator(`a[href="${github}${repo}"]`),
