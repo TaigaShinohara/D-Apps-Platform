@@ -139,6 +139,15 @@ export const projects: readonly ShowcaseEntry[] = [
       en: 'A social app where friends tagged their impressions of one another to build profiles.',
     },
   },
+  {
+    name: 'ハイパーCapsLock',
+    platform: 'macOS / Windows',
+    repository: 'hyper-capslock',
+    summary: {
+      ja: 'CapsLockを、AI開発のコックピットに。単押し=Esc、長押し=Hyper（Ctrl+Alt+Shift+Cmd/Win）。バイブコーディング特化のキー配置。',
+      en: 'Turn CapsLock into an AI-development cockpit: tap for Esc, hold for Hyper (Ctrl+Alt+Shift+Cmd/Win). A vibe-coding keymap for macOS (Karabiner) and Windows (Kanata + AutoHotkey).',
+    },
+  },
 ];
 
 export const skills: readonly ShowcaseEntry[] = [

@@ -289,8 +289,9 @@ test('the homepage distinguishes development projects and public skills from app
       'mori',
       'Hoshizora Watch',
       'Deeple',
+      'ハイパーCapsLock',
     ]);
-    await expect(projects.getByRole('link')).toHaveCount(6);
+    await expect(projects.getByRole('link')).toHaveCount(7);
     await expect(
       projects.getByRole('article').filter({
         has: page.getByRole('heading', { name: 'Deeple', exact: true }),
@@ -303,6 +304,7 @@ test('the homepage distinguishes development projects and public skills from app
       'Scriptlet',
       'kikkake',
       'face-mbti',
+      'hyper-capslock',
     ]) {
       await expect(
         projects.locator(`a[href="${github}${repo}"]`),
