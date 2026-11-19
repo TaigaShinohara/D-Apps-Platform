@@ -96,6 +96,21 @@
   .catalog-card[data-brand='hyper-capslock'] {
     --card-accent: #52651e;
   }
+  .catalog-card[data-brand='livefeel'] {
+    --card-accent: #a83232;
+  }
+  .catalog-card[data-brand='otona-level-100'] {
+    --card-accent: #8c6a00;
+  }
+  .catalog-card[data-brand='migakeru'] {
+    --card-accent: #3f7d44;
+  }
+  .catalog-card[data-brand='tenki-no-kotae'] {
+    --card-accent: #c07a12;
+  }
+  .catalog-card[data-brand='mochimori'] {
+    --card-accent: #548ca8;
+  }
   .catalog-card[data-brand='concept-driven-ux'] {
     --card-accent: #355dc1;
   }

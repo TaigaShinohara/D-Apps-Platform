@@ -61,4 +61,4 @@ The catalog reuses the app icons listed above. It also uses these publisher asse
 | Scriptlet            | Adaptive launcher foreground and background color at `591fe04`, rendered as PNG           | `third-party/Scriptlet-LICENSE`            |
 | mori                 | `apple/Mobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` from the local project | Publisher artwork                          |
 
-D-Apps provides catalog pictograms for うろぼえ, Face MBTI, QR一気よみ, KageCam, ハイパーCapsLock, and the skills. The pictograms are covered by the site license.
+D-Apps provides catalog pictograms for うろぼえ, Face MBTI, QR一気よみ, KageCam, ハイパーCapsLock, LiveFeel, オトナレベル100, ミガケル, 天気のこたえ, もち守り, and the skills. The pictograms are covered by the site license.
