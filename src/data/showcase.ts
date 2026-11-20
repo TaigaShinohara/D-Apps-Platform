@@ -132,6 +132,7 @@ export const projects: readonly ProjectEntry[] = [
       en: 'Revisit notes when the ideas they capture are likely to start fading from memory.',
     },
     platform: 'Android',
+    repository: 'uroboe',
     summary: {
       ja: '忘却曲線をもとに、忘れそうな頃に自分のメモを見返せる。',
       en: 'Review your notes around the time you are likely to forget them, using a forgetting curve.',
@@ -244,6 +245,48 @@ export const projects: readonly ProjectEntry[] = [
       en: 'Turn CapsLock into an AI-development cockpit: tap for Esc, hold for Hyper (Ctrl+Alt+Shift+Cmd/Win). A vibe-coding keymap for macOS (Karabiner) and Windows (Kanata + AutoHotkey).',
     },
   },
+  {
+    id: 'storegate',
+    name: 'StoreGate',
+    detail: {
+      ja: 'App StoreとGoogle Playでよくある審査リジェクトを事前に防ぐオープンなプレイブック兼チェックツールです。117件のリジェクトパターンと対策、プライバシーマニフェストやデータセーフティの点検、AIコーディングツール向けスキルをまとめています。',
+      en: 'An open playbook and pre-submission guard to avoid common App Store and Google Play rejections. Includes 117 rejection patterns and fixes, privacy manifest and Data safety checks, and a skill for AI coding agents.',
+    },
+    platform: 'CLI / Web / AI Agents',
+    repository: 'StoreGate',
+    summary: {
+      ja: 'App Store・Google Playの審査リジェクトを事前に点検して防ぐプレイブック＆ガード。',
+      en: 'Open playbook and pre-submission guard to prevent App Store and Google Play rejections.',
+    },
+  },
+  {
+    id: 'open-screenshot-generator',
+    name: 'Open Screenshot Generator',
+    detail: {
+      ja: 'App StoreやGoogle Play向けのスクリーンショットや掲載素材を作成できるオープンソースのツールです。GUIとCLIに加え、AIエージェントやMCPからも利用できます。',
+      en: 'An open-source tool for creating App Store and Google Play screenshots and store assets, supporting GUI, CLI, AI agents, and MCP.',
+    },
+    platform: 'Web / CLI / MCP',
+    repository: 'open-screenshot-generator',
+    summary: {
+      ja: 'App Store・Google Play用のスクリーンショットや素材を作れるオープンソースツール。',
+      en: 'Open-source GUI, CLI, AI agent, and MCP tool for App Store and Play Store screenshots.',
+    },
+  },
+  {
+    id: 'omamori-pet',
+    name: 'お守りペット',
+    detail: {
+      ja: '静止中の心拍上昇に穏やかに気づき、4-2-6呼吸の触覚ガイドでひと息つくためのAndroid・Wear OS向けウェルネスアプリです。医療診断ではなく、日常の落ち着きを支えるお守りとして設計しました。',
+      en: 'An Android and Wear OS wellness companion that gently notices elevated resting heart rate and guides 4-2-6 breathing with calm haptics. Designed for everyday calm rather than medical diagnosis.',
+    },
+    platform: 'Android / Wear OS',
+    repository: 'omamori_pet',
+    summary: {
+      ja: '静止中の心拍上昇に穏やかに気づき、4-2-6呼吸の触覚ガイドで寄り添うお守りアプリ。',
+      en: 'A calm wellness companion for Android and Wear OS with gentle resting heart-rate awareness and 4-2-6 breathing haptics.',
+    },
+  },
 ];
 
 export const skills: readonly SkillEntry[] = [
@@ -299,6 +342,22 @@ export const skills: readonly SkillEntry[] = [
     summary: {
       ja: 'アプリの情報量を減らし、文字に頼らずアイコン・図形・操作UIで伝える。分割・折りたたみ・段階表示で、読まなくても直感的に使える設計にするスキル。',
       en: 'A skill to reduce app information load — less text, more icons, shapes and UI, with paging, folding and progressive disclosure so apps feel intuitive without reading.',
+    },
+  },
+  {
+    name: 'Material Design 3 UI',
+    repository: 'material-design-3-ui-skill',
+    summary: {
+      ja: 'Material Design 3・Material You・アクセシビリティに沿ったUI設計と実装を支援するスキル。',
+      en: 'A reusable skill for designing, reviewing, and implementing accessible UI with Material Design 3 and Material You.',
+    },
+  },
+  {
+    name: 'Skills Updater',
+    repository: 'skills-updater',
+    summary: {
+      ja: '公開しているAIエージェント向けスキルをワンコマンドで導入・更新するためのインストーラー。',
+      en: 'One-command installer and updater for the published AI agent skills.',
     },
   },
 ];

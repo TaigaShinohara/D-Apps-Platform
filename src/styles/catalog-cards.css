@@ -114,4 +114,19 @@
   .catalog-card[data-brand='minimal-information-design-skill'] {
     --card-accent: #ac3f59;
   }
+  .catalog-card[data-brand='storegate'] {
+    --card-accent: #2c5b7c;
+  }
+  .catalog-card[data-brand='open-screenshot-generator'] {
+    --card-accent: #2c6e58;
+  }
+  .catalog-card[data-brand='omamori-pet'] {
+    --card-accent: #2f5d48;
+  }
+  .catalog-card[data-brand='material-design-3-ui-skill'] {
+    --card-accent: #4c56a8;
+  }
+  .catalog-card[data-brand='skills-updater'] {
+    --card-accent: #7a5c2e;
+  }
 }
