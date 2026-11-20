@@ -246,6 +246,74 @@ export const projects: readonly ProjectEntry[] = [
     },
   },
   {
+    id: 'livefeel',
+    name: 'LiveFeel',
+    detail: {
+      ja: 'Sunoなどで作った曲や手持ちの音源に、会場の響きと客席の空気感を重ねます。会場はライブハウス／ホール／ジャズクラブ／アリーナの4種、ライブ感は弱・中・強から。Before/Afterを切り替えて聴き比べながら仕上げられ、処理は端末内で完結します。',
+      en: 'Layers the resonance of a venue and the air of an audience onto tracks you made (for example with Suno) or already own. Four venues — live house, hall, jazz club and arena — and three levels of live feel. Compare before and after as you listen; everything is processed on the device.',
+    },
+    platform: 'Android',
+    summary: {
+      ja: '自分の曲を入れて会場を選ぶだけ。「自分の曲がステージに立った」ライブ感に加工して書き出すアプリ。',
+      en: 'Drop in your own track, pick a venue, and export it with the feel of a live stage performance.',
+    },
+  },
+  {
+    id: 'otona-level-100',
+    name: 'オトナレベル100',
+    detail: {
+      ja: '道路標識・敬語・科学・漢字など、大人として知っておきたい常識をクイズと暗記カードで抑えていきます。1日5問のペースと、忘却曲線に合わせた復習で、レベル1から100を目指します。',
+      en: 'Covers the common knowledge adults are expected to have — road signs, polite language, science, kanji and more — through quizzes and flashcards. Five questions a day plus review timed to the forgetting curve, on the way from level 1 to 100.',
+    },
+    platform: 'Android',
+    repository: 'otona-level-100',
+    summary: {
+      ja: '「知らないと恥ずかしい常識」を1日5問だけ。スキマ時間で解く、大人の常識クイズ。',
+      en: 'Five questions a day of the common knowledge it would be embarrassing not to know — a common-sense quiz for grown-ups, in spare moments.',
+    },
+  },
+  {
+    id: 'migakeru',
+    name: 'ミガケル',
+    detail: {
+      ja: '今日やることは3つだけ。できたら、それが自信になります。身についた習慣は「卒業」として手放していくので、リストは育てるものではなく軽くしていくもの。連続記録で脅したりはしません（名称は仮称）。',
+      en: 'Just three things to do today; doing them becomes confidence. Habits that stick "graduate" and leave the list, so the list gets lighter instead of longer, and nothing threatens you with a broken streak. The name is provisional.',
+    },
+    platform: 'Android',
+    repository: 'migakeru',
+    summary: {
+      ja: '「自分のこと、昨日より少し好きになる」男磨きアプリ。今日やることは3つだけ。',
+      en: '"Like yourself a little more than yesterday" — a self-care app for men, with just three things to do today.',
+    },
+  },
+  {
+    id: 'tenki-no-kotae',
+    name: '天気のこたえ',
+    detail: {
+      ja: '朝、出かける前に1回開くだけで、昨日より寒いか暑いか、傘がいるか、日焼け止めが要るか、服装をどうするかが決まります。常時表示は、結論1文＋服装＋傘＋日焼け止めの4つだけです。',
+      en: 'Open it once before leaving and you know how today differs from yesterday, whether you need an umbrella or sunscreen, and what to wear. The screen always shows just four things: one conclusion line, clothing, umbrella, and sunscreen.',
+    },
+    platform: 'Android',
+    summary: {
+      ja: '数値ではなく「結局どうしたらいいか」だけを出す天気アプリ。昨日との違い・傘・服装が玄関で決まる。',
+      en: 'A weather app that shows not numbers, but what to do: how today differs from yesterday, umbrella, and clothing — decided at the door.',
+    },
+  },
+  {
+    id: 'mochimori',
+    name: 'もち守り',
+    detail: {
+      ja: '判定は2値で言い切ります。「節電できてる」時は静かでひんやりした淡青のバッテリー、「節電できてない」時は燃えさかる炎のバッテリー。残量が減ると明るさや消灯時間を自動で調整し、直すべき時は理由1つと直し方1タップだけを添えます。',
+      en: 'The verdict is binary: a calm, cool pale-blue battery when power is being saved, and a flaming battery when it is not. As the charge drops it adjusts brightness and screen timeout automatically, and when something needs fixing it shows one reason and a one-tap fix.',
+    },
+    platform: 'Android',
+    repository: 'mochimori',
+    summary: {
+      ja: 'バッテリーの「2つの顔」が、節電できているかを見守る自動節電アプリ。',
+      en: 'An automatic battery-saver watched over by the battery\u2019s two faces, which show whether you are saving power or not.',
+    },
+  },
+  {
     id: 'storegate',
     name: 'StoreGate',
     detail: {

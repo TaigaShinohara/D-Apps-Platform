@@ -302,8 +302,13 @@ test('the homepage distinguishes development projects and public skills from app
       'Hoshizora Watch',
       'Deeple',
       'ハイパーCapsLock',
+      'LiveFeel',
+      'オトナレベル100',
+      'ミガケル',
+      '天気のこたえ',
+      'もち守り',
     ]);
-    await expect(projects.getByRole('link')).toHaveCount(23);
+    await expect(projects.getByRole('link')).toHaveCount(31);
     for (const project of showcasedProjects) {
       const route = `/${lang}/projects/${project.id}/`;
       await expect(
@@ -324,6 +329,9 @@ test('the homepage distinguishes development projects and public skills from app
       'kikkake',
       'face-mbti',
       'hyper-capslock',
+      'otona-level-100',
+      'migakeru',
+      'mochimori',
     ]) {
       await expect(
         projects.locator(`a[href="${github}${repo}"]`),
