@@ -307,8 +307,11 @@ test('the homepage distinguishes development projects and public skills from app
       'ミガケル',
       '天気のこたえ',
       'もち守り',
+      'StoreGate',
+      'Open Screenshot Generator',
+      'お守りペット',
     ]);
-    await expect(projects.getByRole('link')).toHaveCount(31);
+    await expect(projects.getByRole('link')).toHaveCount(38);
     for (const project of showcasedProjects) {
       const route = `/${lang}/projects/${project.id}/`;
       await expect(
@@ -332,6 +335,10 @@ test('the homepage distinguishes development projects and public skills from app
       'otona-level-100',
       'migakeru',
       'mochimori',
+      'uroboe',
+      'StoreGate',
+      'open-screenshot-generator',
+      'omamori_pet',
     ]) {
       await expect(
         projects.locator(`a[href="${github}${repo}"]`),
@@ -352,6 +359,7 @@ test('the homepage distinguishes development projects and public skills from app
       'Easy i18n',
       'Simple Glass',
       'Minimal Information Design',
+      'Material Design 3 UI',
     ]);
     const icons = page.locator(
       '#apps .catalog-icon img, #projects .catalog-icon img, #skills .catalog-icon img',
