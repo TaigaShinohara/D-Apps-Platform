@@ -887,6 +887,18 @@ footer .sig {
 
 .hero-figure {
   margin: 0;
+  padding: clamp(8px, 1.8vw, 18px);
+  border: 1px solid color-mix(in srgb, var(--aqua) 36%, transparent);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--aqua) 9%, var(--paper));
+}
+
+.hero-figure .hero {
+  margin-block: 0;
+}
+
+.hero-figure .hero-cap {
+  padding-inline: 0.35rem;
 }
 .meter-section,
 .memo-lead {

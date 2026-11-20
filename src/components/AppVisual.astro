@@ -1,0 +1,66 @@
+---
+import { Image } from 'astro:assets';
+import { appArtwork } from '../data/app-artwork';
+import type { Locale } from '../lib/catalog';
+import AppIcon from './AppIcon.astro';
+
+interface Props {
+  id: string;
+  name: string;
+  lang: Locale;
+  compact?: boolean;
+  priority?: boolean;
+  publicIcon?: string;
+  fallback?: string;
+}
+
+const { id, name, lang, compact, priority, publicIcon, fallback } = Astro.props;
+const art = appArtwork[id];
+const widths = art
+  ? [
+      ...new Set(
+        [320, 600, compact ? 800 : 1200].map((width) =>
+          Math.min(width, art.image.width),
+        ),
+      ),
+    ]
+  : [];
+const size =
+  art?.kind === 'screen'
+    ? compact
+      ? '(max-width: 680px) 82vw, 360px'
+      : '(max-width: 760px) 82vw, 620px'
+    : compact
+      ? '160px'
+      : '300px';
+---
+
+<figure
+  class="app-visual"
+  data-art={art?.kind ?? 'mark'}
+  aria-hidden={compact || undefined}
+>
+  <div class="app-visual-canvas">
+    {art ? (
+      <Image
+        src={art.image}
+        alt={compact ? '' : art.alt[lang]}
+        width={widths.at(-1)}
+        widths={widths}
+        sizes={size}
+        format="webp"
+        loading={priority ? 'eager' : 'lazy'}
+        fetchpriority={priority ? 'high' : undefined}
+        decoding="async"
+      />
+    ) : (
+      <AppIcon
+        id={id}
+        name={name}
+        publicIcon={publicIcon}
+        fallback={id === 'skills-updater' ? '↻' : fallback}
+      />
+    )}
+  </div>
+  {!compact && art && <figcaption>{art.caption[lang]}</figcaption>}
+</figure>

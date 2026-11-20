@@ -5,7 +5,7 @@ import oneclip from '../assets/oneclip-overview.png';
 type Bilingual = Record<Locale, string>;
 type Artwork = {
   image: ImageMetadata;
-  kind: 'screen' | 'phone' | 'mark';
+  kind: 'screen' | 'phone' | 'mark' | 'character';
   alt: Bilingual;
   caption: Bilingual;
 };
@@ -90,13 +90,16 @@ export const appArtwork: Readonly<Record<string, Artwork | undefined>> = {
     openWeb,
   ),
   aimeter: figure(
-    'aimeter.png',
-    'mark',
+    'aimeter-first-launch.webp',
+    'screen',
     {
-      ja: '濃紺に青いメーターを描いたAIMeterのアイコン',
-      en: 'AIMeter app icon with a cyan meter on navy',
+      ja: 'AIMeterの初回案内と対応するAIサービスの選択画面',
+      en: 'AIMeter’s first-run guide and AI service selection',
     },
-    logo,
+    {
+      ja: 'リポジトリに掲載している初回案内',
+      en: 'First-run guide from the repository',
+    },
   ),
   imagecrate: figure(
     'imagecrate.png',
@@ -126,13 +129,13 @@ export const appArtwork: Readonly<Record<string, Artwork | undefined>> = {
     logo,
   ),
   modoreta: figure(
-    'modoreta.png',
-    'mark',
+    'modoreta-preview.webp',
+    'phone',
     {
-      ja: '深緑の背景に白い輪のモチーフを描いたModoretaのアイコン',
-      en: 'Modoreta’s white circular mark on green',
+      ja: 'ひと呼吸する画面を試したあとのModoretaの案内',
+      en: 'Modoreta’s guide after previewing the pause screen',
     },
-    logo,
+    { ja: '開発時のプレビュー画面', en: 'Preview from development' },
   ),
   scriptlet: figure(
     'scriptlet.png',
@@ -202,5 +205,35 @@ export const appArtwork: Readonly<Record<string, Artwork | undefined>> = {
       en: 'Deeple’s geometric penguin icon',
     },
     { ja: '当時のアプリアイコン', en: 'Original app icon' },
+  ),
+  storegate: figure(
+    'storegate.webp',
+    'mark',
+    {
+      ja: 'チェックマークと緑のゲートを描いたStoreGateのアイコン',
+      en: 'StoreGate icon with a mint-colored gate and checkmark',
+    },
+    logo,
+  ),
+  'open-screenshot-generator': figure(
+    'tiger-screen-shot.webp',
+    'screen',
+    {
+      ja: '紫色のストア画像を並べて編集しているスクリーンショット制作画面',
+      en: 'The screenshot editor arranging a set of purple store graphics',
+    },
+    {
+      ja: 'フォークのリポジトリに掲載されている編集画面',
+      en: 'Editor screenshot from the fork’s repository',
+    },
+  ),
+  'omamori-pet': figure(
+    'omamori-pet.webp',
+    'character',
+    {
+      ja: '丸いミント色の体に白い目を浮かべたお守りペット',
+      en: 'A mint-colored round pet with two white eyes',
+    },
+    { ja: 'アプリ内のペット「おだやか」', en: 'The pet in its calm state' },
   ),
 };

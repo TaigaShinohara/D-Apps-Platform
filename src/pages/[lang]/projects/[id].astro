@@ -36,9 +36,16 @@ const status = projectStatus(project, lang);
     <AppHero
       id={project.id}
       name={project.name}
-      meta={project.platform ?? status}
+      meta={[project.platform, status].filter(Boolean).join(' · ')}
       intro={project.summary[lang]}
       lang={lang}
+      getLabel={
+        project.repository
+          ? ja
+            ? '公開情報を見る'
+            : 'See availability'
+          : undefined
+      }
     />
     <div class="detail-columns">
       <section class="detail-content project-overview">
@@ -46,6 +53,8 @@ const status = projectStatus(project, lang);
         <p class="lead">{project.detail[lang]}</p>
       </section>
       <aside
+        id="get-app"
+        tabindex="-1"
         class="download-panel"
         aria-label={ja ? '公開情報' : 'Availability'}
       >

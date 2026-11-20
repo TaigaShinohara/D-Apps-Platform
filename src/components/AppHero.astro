@@ -1,8 +1,7 @@
 ---
-import { Image } from 'astro:assets';
 import '../styles/app-artwork.css';
-import { appArtwork } from '../data/app-artwork';
 import type { Locale } from '../lib/catalog';
+import AppVisual from './AppVisual.astro';
 
 interface Props {
   id: string;
@@ -14,10 +13,9 @@ interface Props {
 }
 
 const { id, name, meta, intro, lang, getLabel } = Astro.props;
-const art = appArtwork[id];
 ---
 
-<header class:list={['app-hero', { 'app-hero-text': !art }]} data-brand={id}>
+<header class="app-hero" data-brand={id}>
   <div class="app-hero-copy">
     {meta && <p class="app-hero-meta">{meta}</p>}
     <h1 id="content" tabindex="-1">
@@ -30,26 +28,7 @@ const art = appArtwork[id];
       </a>
     )}
   </div>
-  {art && (
-    <figure class:list={['app-hero-media', `app-hero-${art.kind}`]}>
-      <Image
-        src={art.image}
-        alt={art.alt[lang]}
-        format="webp"
-        widths={[360, 720, art.image.width].filter(
-          (w, i, values) => w <= art.image.width && values.indexOf(w) === i,
-        )}
-        sizes={
-          art.kind === 'mark'
-            ? '240px'
-            : art.kind === 'phone'
-              ? '(max-width: 760px) 160px, 200px'
-              : '(max-width: 760px) 88vw, 560px'
-        }
-        loading="eager"
-        fetchpriority="high"
-      />
-      <figcaption>{art.caption[lang]}</figcaption>
-    </figure>
-  )}
+  <div class="app-hero-media">
+    <AppVisual id={id} name={name} lang={lang} priority />
+  </div>
 </header>
