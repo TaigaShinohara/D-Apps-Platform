@@ -420,12 +420,4 @@ export const skills: readonly SkillEntry[] = [
       en: 'A reusable skill for designing, reviewing, and implementing accessible UI with Material Design 3 and Material You.',
     },
   },
-  {
-    name: 'Skills Updater',
-    repository: 'skills-updater',
-    summary: {
-      ja: '公開しているAIエージェント向けスキルをワンコマンドで導入・更新するためのインストーラー。',
-      en: 'One-command installer and updater for the published AI agent skills.',
-    },
-  },
 ];

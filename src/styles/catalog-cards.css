@@ -141,7 +141,4 @@
   .catalog-card[data-brand='material-design-3-ui-skill'] {
     --card-accent: #4c56a8;
   }
-  .catalog-card[data-brand='skills-updater'] {
-    --card-accent: #7a5c2e;
-  }
 }
