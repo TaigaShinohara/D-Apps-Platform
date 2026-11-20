@@ -1,70 +1,56 @@
 @layer components {
   .catalog-card {
-    --card-accent: var(--art-accent, #31536e);
-    --card-padding: clamp(1rem, 2.4vw, 1.45rem);
+    position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     min-inline-size: 0;
-    border: 1px solid color-mix(in srgb, var(--card-accent) 22%, var(--line));
-    border-radius: 17px;
+    padding: 9px;
+    border: 1px solid var(--line);
+    border-radius: 22px;
     background: #fff;
+    box-shadow: 0 4px 18px rgb(27 24 58 / 4%);
+    transition:
+      box-shadow 180ms ease,
+      border-color 180ms ease;
   }
 
   .catalog-card:is(:hover, :focus-within) {
-    border-color: color-mix(in srgb, var(--card-accent) 50%, var(--line));
+    border-color: color-mix(in srgb, var(--art-accent) 58%, #8f96a9);
+    box-shadow: 0 13px 34px rgb(27 24 58 / 10%);
   }
 
-  .catalog-card-heading {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(0.75rem, 2vw, 1rem);
-    padding: var(--card-padding);
-    border-radius: 16px 16px 0 0;
-    border-block-end: 1px solid
-      color-mix(in srgb, var(--card-accent) 14%, var(--line));
-    background: linear-gradient(
-      120deg,
-      color-mix(in srgb, var(--card-accent) 23%, white),
-      color-mix(in srgb, var(--card-accent) 6%, white)
-    );
+  .catalog-card-visual {
+    border-radius: 15px;
   }
 
-  .catalog-card h3 {
-    font-size: clamp(1.2rem, 1rem + 0.5vw, 1.45rem);
-    letter-spacing: -0.025em;
-    text-wrap: wrap;
+  .catalog-card-visual :is(.app-visual, .app-visual-canvas) {
+    border-radius: inherit;
   }
 
-  .catalog-card h3 a {
-    color: var(--ink);
-    text-decoration-color: var(--muted);
-    text-decoration-thickness: 1px;
+  .catalog-card-visual .app-visual-canvas {
+    block-size: clamp(155px, 18vw, 218px);
+    padding: 16px;
   }
 
-  .catalog-card h3 a:hover {
-    text-decoration-thickness: 2px;
+  .catalog-card-visual .app-visual-canvas > img,
+  .catalog-card-visual .catalog-icon {
+    transition: transform 220ms ease;
   }
 
-  .catalog-icon {
-    display: grid;
-    place-items: center;
-    inline-size: 64px;
-    aspect-ratio: 1;
-    padding: 3px;
-    border: 1px solid rgb(255 255 255 / 85%);
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgb(23 37 60 / 15%);
-    font-weight: 700;
-    font-size: 1.4rem;
+  .catalog-card:is(:hover, :focus-within)
+    :is(.app-visual-canvas > img, .catalog-icon) {
+    transform: translateY(-3px) scale(1.035);
   }
 
-  .catalog-icon img {
-    inline-size: 100%;
-    aspect-ratio: 1;
-    border-radius: 12px;
-    object-fit: contain;
+  .catalog-card-visual
+    .app-visual[data-art='mark']
+    :is(.catalog-icon, .app-visual-canvas > img) {
+    inline-size: clamp(75px, 32%, 116px);
+  }
+
+  .catalog-card-visual .app-visual[data-art='character'] img {
+    inline-size: min(60%, 170px);
   }
 
   .catalog-card-body {
@@ -72,73 +58,76 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.45rem;
-    padding: 1rem var(--card-padding);
+    gap: 0.36rem;
+    padding: clamp(12px, 2vw, 18px);
   }
 
   .catalog-card-body .card-meta {
     margin: 0;
+    font-weight: 650;
   }
 
-  .catalog-card-body .text-link {
+  .catalog-card .card-summary {
+    margin-block-end: 0.65rem;
+    line-height: 1.6;
+  }
+
+  .card-meta.catalog-card-status,
+  .catalog-card .catalog-source {
     margin-block-start: auto;
   }
 
-  .catalog-card[data-brand='uroboe'] {
-    --card-accent: #6553b5;
+  .catalog-card h3 {
+    font-size: clamp(1.24rem, 1.05rem + 0.62vw, 1.65rem);
+    line-height: 1.22;
+    text-wrap: wrap;
+    padding-inline-end: 2rem;
   }
-  .catalog-card[data-brand='qr-ikki-yomi'] {
-    --card-accent: #087478;
+
+  .catalog-card-link {
+    color: var(--ink);
+    text-decoration: none;
   }
-  .catalog-card[data-brand='kagecam'] {
-    --card-accent: #465f99;
+
+  .catalog-card-link::before {
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    content: '';
   }
-  .catalog-card[data-brand='hyper-capslock'] {
-    --card-accent: #52651e;
+
+  .catalog-card-link::after {
+    position: absolute;
+    inset-inline-end: 16px;
+    inset-block-start: 16px;
+    display: grid;
+    place-items: center;
+    inline-size: 36px;
+    aspect-ratio: 1;
+    border: 1px solid color-mix(in srgb, var(--art-accent) 26%, transparent);
+    border-radius: 50%;
+    background: var(--art-tint);
+    color: var(--art-ink);
+    content: '↗' / '';
+    font-size: 1.05rem;
   }
-  .catalog-card[data-brand='livefeel'] {
-    --card-accent: #a83232;
+
+  .catalog-card-link:is(:hover, :focus-visible) {
+    text-decoration: underline;
   }
-  .catalog-card[data-brand='otona-level-100'] {
-    --card-accent: #8c6a00;
+
+  .catalog-source {
+    position: relative;
+    color: var(--muted);
+    font-size: 0.83rem;
+    font-weight: 650;
   }
-  .catalog-card[data-brand='migakeru'] {
-    --card-accent: #3f7d44;
+
+  .skill-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   }
-  .catalog-card[data-brand='tenki-no-kotae'] {
-    --card-accent: #c07a12;
-  }
-  .catalog-card[data-brand='mochimori'] {
-    --card-accent: #548ca8;
-  }
-  .catalog-card[data-brand='concept-driven-ux'] {
-    --card-accent: #355dc1;
-  }
-  .catalog-card[data-brand='mobile-onboarding'] {
-    --card-accent: #337d62;
-  }
-  .catalog-card[data-brand='store-submission-skills'] {
-    --card-accent: #ad5326;
-  }
-  .catalog-card[data-brand='easy-i18n-skill'] {
-    --card-accent: #136e85;
-  }
-  .catalog-card[data-brand='simple-glass-skill'] {
-    --card-accent: #7658a9;
-  }
-  .catalog-card[data-brand='minimal-information-design-skill'] {
-    --card-accent: #ac3f59;
-  }
-  .catalog-card[data-brand='storegate'] {
-    --card-accent: #2c5b7c;
-  }
-  .catalog-card[data-brand='open-screenshot-generator'] {
-    --card-accent: #2c6e58;
-  }
-  .catalog-card[data-brand='omamori-pet'] {
-    --card-accent: #2f5d48;
-  }
-  .catalog-card[data-brand='material-design-3-ui-skill'] {
-    --card-accent: #4c56a8;
+
+  .skill-grid .app-visual-canvas {
+    block-size: 138px;
   }
 }

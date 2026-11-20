@@ -62,3 +62,11 @@ The catalog reuses the app icons listed above. It also uses these publisher asse
 | mori                 | `apple/Mobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` from the local project | Publisher artwork                          |
 
 D-Apps provides catalog pictograms for うろぼえ, Face MBTI, QR一気よみ, KageCam, ハイパーCapsLock, LiveFeel, オトナレベル100, ミガケル, 天気のこたえ, もち守り, and the skills. The pictograms are covered by the site license.
+
+The showcase also uses these images from the project sources:
+
+- AIMeter first-run screen from `docs/images/first-launch.png` at `6a39fa9`. See `third-party/AIMeter-LICENSE`.
+- Modoreta development preview from `docs/evidence/first-use-2026-10-10/after-preview-outcome.png` at `6551829`. Publisher artwork.
+- StoreGate app icon from `desktop/Resources/AppIcon.png` in [StoreGate](https://github.com/TaigaShinohara/StoreGate) at `5bf2807`. See `third-party/StoreGate-LICENSE`.
+- The editor screenshot from `docs/screenshot-editor.png` in [tiger screen shot](https://github.com/TaigaShinohara/tiger-screen-shot) at `e641d4e`. The fork retains Idrees Khan’s MIT notice in `third-party/tiger-screen-shot-LICENSE`.
+- The calm pet, rendered from `shared/src/main/android-res/drawable/pet_calm.xml` in [omamori_pet](https://github.com/TaigaShinohara/omamori_pet) at `d18243e`. Publisher artwork.

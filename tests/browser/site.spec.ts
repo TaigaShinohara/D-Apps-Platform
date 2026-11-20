@@ -81,8 +81,18 @@ for (const lang of ['ja', 'en']) {
     for (const path of [
       `/${lang}/`,
       ...appDetails.map((app) => `/${lang}/apps/${app.id}/`),
-      ...['aimeter', 'imagecrate', 'mori', 'kagecam', 'face-mbti'].map(
-        (id) => `/${lang}/projects/${id}/`,
+      ...[
+        'aimeter',
+        'imagecrate',
+        'mori',
+        'kagecam',
+        'face-mbti',
+        'open-screenshot-generator',
+        'omamori-pet',
+        'storegate',
+      ].map((id) => `/${lang}/projects/${id}/`),
+      ...['minimal-information-design-skill', 'skills-updater'].map(
+        (id) => `/${lang}/skills/${id}/`,
       ),
       ...['about', 'privacy', 'safety', 'license', 'support'].map(
         (slug) => `/${lang}/${slug}/`,
@@ -286,32 +296,8 @@ test('the homepage distinguishes development projects and public skills from app
     const projects = page.locator('#projects');
     const skills = page.locator('#skills');
     await expect(projects.getByRole('heading', { level: 3 })).toHaveText([
-      'AIMeter',
-      'ImageCrate',
-      'VideoHarbor',
-      'RabbitTracker',
-      'Modoreta',
-      'Scriptlet',
-      'kikkake',
-      'うろぼえ',
-      '顔写真 MBTI診断',
-      'QR一気よみ',
-      'KageCam',
-      'Deeplik',
-      'mori',
-      'Hoshizora Watch',
-      'Deeple',
-      'ハイパーCapsLock',
-      'LiveFeel',
-      'オトナレベル100',
-      'ミガケル',
-      '天気のこたえ',
-      'もち守り',
-      'StoreGate',
-      'Open Screenshot Generator',
-      'お守りペット',
+      ...showcasedProjects.map((project) => project.name),
     ]);
-    await expect(projects.getByRole('link')).toHaveCount(38);
     for (const project of showcasedProjects) {
       const route = `/${lang}/projects/${project.id}/`;
       await expect(
@@ -337,8 +323,9 @@ test('the homepage distinguishes development projects and public skills from app
       'mochimori',
       'uroboe',
       'StoreGate',
-      'open-screenshot-generator',
+      'tiger-screen-shot',
       'omamori_pet',
+      'kagecam',
     ]) {
       await expect(
         projects.locator(`a[href="${github}${repo}"]`),
@@ -360,12 +347,21 @@ test('the homepage distinguishes development projects and public skills from app
       'Simple Glass',
       'Minimal Information Design',
       'Material Design 3 UI',
+      'Skills Updater',
     ]);
-    const icons = page.locator(
-      '#apps .catalog-icon img, #projects .catalog-icon img, #skills .catalog-icon img',
-    );
+    for (const skill of showcasedSkills) {
+      const route = `/${lang}/skills/${skill.repository}/`;
+      await expect(
+        skills.getByRole('link', { name: skill.name, exact: true }),
+      ).toHaveAttribute('href', route);
+      expect(sitemap).toContain(canonicalOrigin + route);
+      const detail = await request.get(route);
+      expect(detail.ok(), route).toBe(true);
+      expect(await detail.text()).toContain(github + skill.repository);
+    }
+    const icons = page.locator('.catalog-card-visual img');
     await expect(icons).toHaveCount(
-      apps.length + showcasedProjects.length + showcasedSkills.length,
+      apps.length + showcasedProjects.length + showcasedSkills.length - 1,
     );
     const iconSources = await icons.evaluateAll((images) =>
       images.map((img) => ({

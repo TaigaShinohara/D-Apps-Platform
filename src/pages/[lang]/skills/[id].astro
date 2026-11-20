@@ -1,0 +1,77 @@
+---
+import AppHero from '../../../components/AppHero.astro';
+import { skills, type SkillEntry } from '../../../data/showcase';
+import Layout from '../../../layouts/Layout.astro';
+import { locales, type Locale } from '../../../lib/catalog';
+
+export function getStaticPaths() {
+  return locales.flatMap((lang) =>
+    skills.map((skill) => ({
+      params: { lang, id: skill.repository },
+      props: { skill },
+    })),
+  );
+}
+
+const { skill } = Astro.props as { skill: SkillEntry };
+const lang = Astro.params.lang as Locale;
+const ja = lang === 'ja';
+---
+
+<Layout
+  lang={lang}
+  title={skill.name}
+  description={skill.summary[lang]}
+  path={`skills/${skill.repository}/`}
+>
+  <div class="wrap detail">
+    <a class="back-link" href={`/${lang}/#skills`}>
+      ← {ja ? 'スキル一覧' : 'All skills'}
+    </a>
+    <AppHero
+      id={skill.repository}
+      name={skill.name}
+      meta={
+        skill.repository === 'skills-updater'
+          ? ja
+            ? 'コマンドラインツール'
+            : 'Command-line tool'
+          : ja
+            ? 'AIエージェント向けスキル'
+            : 'Skill for AI agents'
+      }
+      intro={skill.summary[lang]}
+      lang={lang}
+      getLabel={ja ? '使い方を見る' : 'See how to use it'}
+    />
+    <div class="detail-columns">
+      <section class="detail-content project-overview">
+        <h2>{ja ? 'できること' : 'What it does'}</h2>
+        <p class="lead">{skill.detail[lang]}</p>
+        {skill.members && (
+          <>
+            <h3>{ja ? '収録スキル' : 'Included skills'}</h3>
+            <ul class="feature-list">
+              {skill.members.map((member) => (
+                <li>
+                  <code>{member}</code>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+      <aside id="get-app" class="download-panel" tabindex="-1">
+        <h2>{ja ? '使い方とインストール' : 'Usage and installation'}</h2>
+        <a
+          class="button"
+          href={`https://github.com/TaigaShinohara/${skill.repository}`}
+          rel="noopener noreferrer"
+        >
+          {ja ? 'GitHubでREADMEを読む' : 'Read the GitHub README'}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </aside>
+    </div>
+  </div>
+</Layout>

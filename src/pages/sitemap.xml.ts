@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { apps, locales } from '../lib/catalog';
-import { projects } from '../data/showcase';
+import { projects, skills } from '../data/showcase';
 
 export const GET: APIRoute = ({ site }) => {
   const paths = [
@@ -12,6 +12,7 @@ export const GET: APIRoute = ({ site }) => {
     'support/',
     ...apps.map((app) => `apps/${app.id}/`),
     ...projects.map((project) => `projects/${project.id}/`),
+    ...skills.map((skill) => `skills/${skill.repository}/`),
   ];
   const entries = locales.flatMap((lang) =>
     paths.map(

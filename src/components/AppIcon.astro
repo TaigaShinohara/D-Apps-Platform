@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { appArtwork } from '../data/app-artwork';
 
 interface Props {
   id: string;
@@ -15,18 +14,15 @@ const icons = import.meta.glob<ImageMetadata>('../assets/catalog-icons/*.png', {
   import: 'default',
 });
 const { id, name, publicIcon, fallback } = Astro.props;
-const artwork = appArtwork[id];
-const icon =
-  icons[`../assets/catalog-icons/${id}.png`] ??
-  (artwork?.kind === 'mark' ? artwork.image : undefined);
+const icon = fallback ? undefined : icons[`../assets/catalog-icons/${id}.png`];
 ---
 
 <span class="catalog-icon" aria-hidden="true">
   {icon ? (
     <Image
       src={icon}
-      width={144}
-      height={144}
+      width={Math.min(320, icon.width)}
+      height={Math.min(320, icon.height)}
       format="webp"
       alt=""
       loading="lazy"

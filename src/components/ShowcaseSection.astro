@@ -5,7 +5,7 @@ import {
   type SkillEntry,
 } from '../data/showcase';
 import type { Locale } from '../lib/catalog';
-import AppIcon from './AppIcon.astro';
+import AppVisual from './AppVisual.astro';
 
 interface Props {
   id: 'projects' | 'skills';
@@ -22,41 +22,39 @@ const ja = lang === 'ja';
   <div class="section-heading">
     <h2 id={`${id}-heading`}>{title}</h2>
   </div>
-  <div class="app-grid">
+  <div class:list={['app-grid', { 'skill-grid': id === 'skills' }]}>
     {items.map((item) => {
-      const brand = 'id' in item ? item.id : item.repository;
+      const project = 'id' in item;
+      const brand = project ? item.id : item.repository;
       return (
         <article class="catalog-card" data-brand={brand}>
-          <header class="catalog-card-heading">
-            <AppIcon id={brand} name={item.name} />
-            <h3>
-              {'id' in item ? (
-                <a href={`/${lang}/projects/${item.id}/`}>{item.name}</a>
-              ) : (
-                item.name
-              )}
-            </h3>
-          </header>
+          <div class="catalog-card-visual">
+            <AppVisual id={brand} name={item.name} lang={lang} compact />
+          </div>
           <div class="catalog-card-body">
-            {'id' in item && (
-              <p class="card-meta">
-                {item.platform && `${item.platform} · `}
+            {project && item.platform && (
+              <p class="card-meta">{item.platform}</p>
+            )}
+            <h3>
+              <a class="catalog-card-link" href={`/${lang}/${id}/${brand}/`}>
+                {item.name}
+              </a>
+            </h3>
+            <p class="card-summary">{item.summary[lang]}</p>
+            {project && (
+              <p class="card-meta catalog-card-status">
                 {projectStatus(item, lang)}
               </p>
             )}
-            <p class="card-summary">{item.summary[lang]}</p>
-            {item.members && (
-              <p class="card-meta">{item.members.join(' · ')}</p>
-            )}
             {item.repository && (
               <a
-                class="text-link"
+                class="catalog-source"
                 href={`https://github.com/TaigaShinohara/${item.repository}`}
                 rel="noopener noreferrer"
               >
                 {ja ? 'GitHubで見る' : 'View on GitHub'}
                 <span class="sr-only"> {item.name}</span>
-                <span aria-hidden="true">↗</span>
+                <span aria-hidden="true"> ↗</span>
               </a>
             )}
           </div>
@@ -64,5 +62,4 @@ const ja = lang === 'ja';
       );
     })}
   </div>
-  <slot />
 </section>
