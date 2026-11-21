@@ -361,8 +361,14 @@ test('the homepage distinguishes development projects and public skills from app
     }
     const icons = page.locator('.catalog-card-visual img');
     await expect(icons).toHaveCount(
-      apps.length + showcasedProjects.length + showcasedSkills.length - 1,
+      apps.length + showcasedProjects.length + showcasedSkills.length,
     );
+    const updaterIcon = skills.locator('[data-brand="skills-updater"] img');
+    await expect(updaterIcon).toHaveAttribute(
+      'src',
+      /^\/_astro\/skills-updater\..*\.webp$/,
+    );
+    const updaterIconSrc = await updaterIcon.getAttribute('src');
     const iconSources = await icons.evaluateAll((images) =>
       images.map((img) => ({
         src: img.getAttribute('src'),
@@ -403,6 +409,14 @@ test('the homepage distinguishes development projects and public skills from app
       'href',
       github + 'ImageCrate-public',
     );
+    await page.goto(`http://127.0.0.1:4321/${lang}/skills/skills-updater/`);
+    const updaterVisual = page.locator('.app-hero-media img');
+    await expect(updaterVisual).toHaveAttribute('src', updaterIconSrc!);
+    await expect
+      .poll(() =>
+        updaterVisual.evaluate((img: HTMLImageElement) => img.naturalWidth),
+      )
+      .toBeGreaterThan(0);
   }
   await context.close();
 });
