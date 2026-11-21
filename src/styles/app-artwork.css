@@ -393,6 +393,7 @@
   [data-brand='skills-updater'] {
     --art-bg: #f4e6cd;
     --art-tint: #fff8e9;
+    --art-ink: #312314;
     --art-accent: #75501a;
   }
 }
