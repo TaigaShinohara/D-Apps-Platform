@@ -363,11 +363,13 @@ test('the homepage distinguishes development projects and public skills from app
     await expect(icons).toHaveCount(
       apps.length + showcasedProjects.length + showcasedSkills.length,
     );
-    const updaterIcon = skills.locator('[data-brand="skills-updater"] img');
+    const updaterCard = skills.locator('[data-brand="skills-updater"]');
+    const updaterIcon = updaterCard.locator('img');
     await expect(updaterIcon).toHaveAttribute(
       'src',
       /^\/_astro\/skills-updater\..*\.webp$/,
     );
+    await expect(updaterIcon).toHaveAttribute('srcset', /\b512w\b/);
     const updaterIconSrc = await updaterIcon.getAttribute('src');
     const iconSources = await icons.evaluateAll((images) =>
       images.map((img) => ({
@@ -387,9 +389,31 @@ test('the homepage distinguishes development projects and public skills from app
         expect(response.headers()['content-type']).toMatch(/^image\//);
       }),
     );
-    await expect(
-      skills.locator(`a[href="${github}skills-updater"]`),
-    ).toBeVisible();
+    const updaterSource = updaterCard.locator(
+      `a[href="${github}skills-updater"]`,
+    );
+    await expect(updaterSource).toBeVisible();
+    await expect(updaterSource).toContainText('↗');
+    const updaterLink = updaterCard.getByRole('link', {
+      name: 'Skills Updater',
+      exact: true,
+    });
+    expect(
+      await updaterLink.evaluate(
+        (link) => getComputedStyle(link, '::after').content,
+      ),
+    ).toContain('→');
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const updaterLinkGap = await updaterCard.evaluate((card) => {
+      const summary = card.querySelector('.card-summary')!;
+      const source = card.querySelector('.catalog-source')!;
+      return (
+        source.getBoundingClientRect().top -
+        summary.getBoundingClientRect().bottom
+      );
+    });
+    expect(updaterLinkGap).toBeLessThan(32);
+    await page.setViewportSize({ width: 320, height: 720 });
     await expect(
       page.locator('#projects a[download], #skills a[download]'),
     ).toHaveCount(0);
@@ -412,6 +436,7 @@ test('the homepage distinguishes development projects and public skills from app
     await page.goto(`http://127.0.0.1:4321/${lang}/skills/skills-updater/`);
     const updaterVisual = page.locator('.app-hero-media img');
     await expect(updaterVisual).toHaveAttribute('src', updaterIconSrc!);
+    await expect(updaterVisual).toHaveAttribute('srcset', /\b512w\b/);
     await expect
       .poll(() =>
         updaterVisual.evaluate((img: HTMLImageElement) => img.naturalWidth),
