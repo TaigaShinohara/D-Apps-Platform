@@ -7,22 +7,27 @@ interface Props {
   name: string;
   publicIcon?: string;
   fallback?: string;
+  compact?: boolean;
 }
 
 const icons = import.meta.glob<ImageMetadata>('../assets/catalog-icons/*.png', {
   eager: true,
   import: 'default',
 });
-const { id, name, publicIcon, fallback } = Astro.props;
+const { id, name, publicIcon, fallback, compact } = Astro.props;
 const icon = fallback ? undefined : icons[`../assets/catalog-icons/${id}.png`];
+const responsiveWidths =
+  icon && icon.width >= 512 ? [128, 256, 512] : undefined;
 ---
 
 <span class="catalog-icon" aria-hidden="true">
   {icon ? (
     <Image
       src={icon}
-      width={Math.min(320, icon.width)}
-      height={Math.min(320, icon.height)}
+      width={Math.min(512, icon.width)}
+      height={Math.min(512, icon.height)}
+      widths={responsiveWidths}
+      sizes={responsiveWidths ? (compact ? '116px' : '206px') : undefined}
       format="webp"
       alt=""
       loading="lazy"

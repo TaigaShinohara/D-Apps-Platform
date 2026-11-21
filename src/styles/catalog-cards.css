@@ -130,4 +130,16 @@
   .skill-grid .app-visual-canvas {
     block-size: 138px;
   }
+
+  .catalog-card[data-brand='skills-updater'] {
+    align-self: start;
+  }
+
+  .catalog-card[data-brand='skills-updater'] .catalog-source {
+    margin-block-start: 0;
+  }
+
+  .catalog-card[data-brand='skills-updater'] .catalog-card-link::after {
+    content: '→' / '';
+  }
 }
